@@ -1,0 +1,2 @@
+Run this command when in the directory containing your project's home directory:
+    open -n -a love "HelloLove"
