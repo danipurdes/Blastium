@@ -5,10 +5,18 @@ player = {
   yvel = 0,
   rotation = 0,
   ANGACCEL = 0,
-  shots = {},
-  ammo = 100,
-  firing_rate_tot = .4,
-  firing_rate_cur = 0
+
+  bullet_shots = {},
+  bullet_ammo = 25,
+  bullet_firing_rate_tot = .4,
+  bullet_firing_rate_cur = 0,
+  bullet_mass = 5,
+
+  flame_shots = {},
+  flame_ammo = 400,
+  flame_firing_rate_tot = .025,
+  flame_firing_rate_cur = 0,
+  flame_mass = 1
 }
 
 local ROTATION_SPEED = 180
@@ -45,14 +53,23 @@ function love.update(dt)
   end
 
 
-  player.firing_rate_cur = player.firing_rate_cur - dt
+  player.bullet_firing_rate_cur = player.bullet_firing_rate_cur - dt
+  player.flame_firing_rate_cur  = player.flame_firing_rate_cur - dt
 
-  if love.keyboard.isDown("space") then
+  if love.keyboard.isDown("h") then
     shoot()
   end
 
-  if player.firing_rate_cur <= 0 then
-    player.firing_rate_cur = 0
+  if love.keyboard.isDown("j") then
+    flamethrower()
+  end
+
+  if player.bullet_firing_rate_cur <= 0 then
+    player.bullet_firing_rate_cur = 0
+  end
+
+  if player.flame_firing_rate_cur <= 0 then
+    player.flame_firing_rate_cur = 0
   end
 
   player.xvel = player.xvel - (player.xvel / DRAG)
@@ -80,24 +97,39 @@ function love.update(dt)
   end
 
   -- update the shots
-  for i=#player.shots,1,-1 do
+  for i=#player.bullet_shots,1,-1 do
     -- move them up up up
-    local v = player.shots[i]
+    local v = player.bullet_shots[i]
     v.x = v.x + dt * math.cos(v.rotation) * v.tvel
     v.y = v.y + dt * math.sin(v.rotation) * v.tvel
     -- mark shots that are not visible for removal
     if v.y < 0 or v.y > love.graphics.getHeight() or v.x < 0 or v.x > love.graphics.getWidth() then
-      table.remove(player.shots, i)
+      table.remove(player.bullet_shots, i)
+    end
+  end
+
+  for i=#player.flame_shots,1,-1 do
+    -- move them up up up
+    local v = player.flame_shots[i]
+    v.x = v.x + dt * math.cos(v.rotation) * v.tvel
+    v.y = v.y + dt * math.sin(v.rotation) * v.tvel
+    -- mark shots that are not visible for removal
+    if v.y < 0 or v.y > love.graphics.getHeight() or v.x < 0 or v.x > love.graphics.getWidth() then
+      table.remove(player.flame_shots, i)
     end
   end
 end
 
+
 function love.draw()
   love.graphics.setColor(255, 255, 255)
   love.graphics.print("(" .. math.floor(player.x) .. ", " .. math.floor(player.y) .. ") : " .. math.floor(vel_total), 10, 10)
-  love.graphics.print("Number of bullets : " .. #player.shots, 10, 20)
-  love.graphics.print("Ammo : " .. player.ammo, 10, 30)
-  love.graphics.print("Time to reload : " .. player.firing_rate_cur .. " / " .. player.firing_rate_tot, 10, 40)
+  love.graphics.print("Number of bullets : " .. #player.bullet_shots, 10, 20)
+  love.graphics.print("Ammo : " .. player.bullet_ammo, 10, 30)
+  love.graphics.print("Time to reload : " .. player.bullet_firing_rate_cur .. " / " .. player.bullet_firing_rate_tot, 10, 40)
+  love.graphics.print("Number of flame bullets : " .. #player.flame_shots, 10, 60)
+  love.graphics.print("Flame Ammo : " .. player.flame_ammo, 10, 70)
+  love.graphics.print("Time to reload flame shot : " .. player.flame_firing_rate_cur .. " / " .. player.flame_firing_rate_tot, 10, 80)
 
   --if (love.keyboard.isDown("space")) then
     --love.graphics.translate(2*math.random(), 2*math.random())
@@ -114,8 +146,13 @@ function love.draw()
 
   -- let's draw our heros shots
   love.graphics.setColor(255,255,255)
-  for i,v in ipairs(player.shots) do
+  for i,v in ipairs(player.bullet_shots) do
     love.graphics.line(v.x, v.y, v.x + 4 * math.cos(v.rotation), v.y + 4 * math.sin(v.rotation))
+  end
+
+  love.graphics.setColor(255,0,100)
+  for i,v in ipairs(player.flame_shots) do
+    love.graphics.line(v.x, v.y, v.x + 2 * math.cos(v.rotation), v.y + 2 * math.sin(v.rotation))
   end
 end
 
@@ -126,9 +163,9 @@ function love.keydown(key)
 end
 
 function shoot()
-    if player.ammo > 0 and player.firing_rate_cur <= 0 then
-        local times = player.firing_rate_cur
-        while times <= 0 and player.ammo > 0 do
+    if player.bullet_ammo > 0 and player.bullet_firing_rate_cur <= 0 then
+        local times = player.bullet_firing_rate_cur
+        while times <= 0 and player.bullet_ammo > 0 do
             local tv = math.sqrt(player.xvel * player.xvel + player.yvel * player.yvel) + 300
 
             player.xvel = player.xvel - 2 * math.cos(player.rotation)
@@ -139,13 +176,13 @@ function shoot()
             shot1.y = player.y + 5 * math.random()
             shot1.tvel = tv
             shot1.rotation = player.rotation + math.random(-3,3) * math.pi / 180
-            table.insert(player.shots, shot1)
+            table.insert(player.bullet_shots, shot1)
 
-            player.ammo = player.ammo - 1
-            times = times + player.firing_rate_tot
+            player.bullet_ammo = player.bullet_ammo - 1
+            times = times + player.bullet_firing_rate_tot
         end
 
-        player.firing_rate_cur = times
+        player.bullet_firing_rate_cur = times
     end
 
     --local shot2 = {}
@@ -161,4 +198,28 @@ function shoot()
     --shot3.tvel = tv
     --shot3.rotation = player.rotation + 5 * math.pi / 180
     --table.insert(player.shots, shot3)
+end
+
+function flamethrower()
+    if player.flame_ammo > 0 and player.flame_firing_rate_cur <= 0 then
+        local times = player.flame_firing_rate_cur
+        while times <= 0 and player.flame_ammo > 0 do
+            local tv = math.sqrt(player.xvel * player.xvel + player.yvel * player.yvel) + 300
+
+            player.xvel = player.xvel - 2 * math.cos(player.rotation)
+            player.yvel = player.yvel - 2 * math.sin(player.rotation)
+
+            local shot1 = {}
+            shot1.x = player.x + 5 * math.random()
+            shot1.y = player.y + 5 * math.random()
+            shot1.tvel = tv
+            shot1.rotation = player.rotation + math.random(-3,3) * math.pi / 180
+            table.insert(player.flame_shots, shot1)
+
+            player.flame_ammo = player.flame_ammo - 1
+            times = times + player.flame_firing_rate_tot
+        end
+
+        player.flame_firing_rate_cur = times
+    end
 end
