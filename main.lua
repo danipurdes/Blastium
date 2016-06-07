@@ -1,5 +1,5 @@
 world = {
-  name = "Space Game",
+  name = "Blastium",
   canvas = love.graphics.newCanvas(500,500),
   offset_x = 25,
   offset_y = 75,
@@ -9,7 +9,8 @@ world = {
     " abcdefghijklmnopqrstuvwxyz" ..
     "ABCDEFGHIJKLMNOPQRSTUVWXYZ0" ..
     "123456789.,!?-+/():;%&`'*#=[]\""),
-  state = "start"
+  state = "start",
+  score = 0
 }
 
 player = {
@@ -77,8 +78,6 @@ local ROTATION_SPEED = 180
 local ACCELERATION = 400
 local DRAG = 100
 local MAX_SPEED = 400
-
-
 
 function love.update(dt)
   if world.state == "start" then
@@ -251,6 +250,7 @@ function love.keypressed(key)
   if world.state == "start" then
       if key == "space" then
         world.state = "play"
+        world.score = 0
       end
   elseif world.state == "play" then
       if key == "q" then
@@ -269,18 +269,10 @@ function love.keypressed(key)
         end
       end
 
-      if key == "h" then
-        world.offset_x = world.offset_x + 1
-      end
-      if key == "n" then
-        world.offset_x = world.offset_x - 1
-      end
       if key == "j" then
-        world.offset_y = world.offset_y + 1
+        world.score = world.score + 1
       end
-      if key == "m" then
-        world.offset_y = world.offset_y - 1
-      end
+
   elseif world.state == "end" then
       if key == "space" then
         world.state = "start"
@@ -293,8 +285,8 @@ function draw()
     love.graphics.setColor(255, 255, 255)
 
     if world.state == "start" then
-      local start_text = "-PRESS START TO PLAY-"
-      love.graphics.printf(start_text, 0, world.height / 2, world.width, "center")
+        local start_text = "-PRESS START TO PLAY-"
+        love.graphics.printf(start_text, 0, world.height / 2, world.width, "center")
     elseif world.state == "play" then
         local weapon_text = ""
         if player.weapon_index == 0 then
@@ -316,6 +308,8 @@ function draw()
           weapon_text = weapon_text .. "Time to reload : " .. shell_weapon.firing_rate_current .. " / " .. shell_weapon.firing_rate_total
           love.graphics.print(weapon_text, 10, 10)
         end
+
+        love.graphics.printf("Score : " .. world.score, 10, 10, world.width - 20, "right")
 
         love.graphics.draw(player.image, player.x, player.y, player.rotation, 1, 1, 8, 8)
         if player.x > world.width / 2 then
@@ -343,17 +337,21 @@ function draw()
         for i,v in ipairs(shell_weapon.shots) do
           love.graphics.draw(shell_round.image, v.x, v.y, v.rotation)
         end
+
     elseif world.state == "end" then
-        --
+        local end_text = "-GAME OVER-"
+        local score_text = "Score : " .. world.score
+        love.graphics.printf(end_text, 0, world.height / 2 - 10, world.width, "center")
+        love.graphics.printf(score_text, 0, world.height / 2 + 10, world.width, "center")
     end
 end
 
 function love.draw()
-  love.graphics.clear()
+  love.graphics.clear(0,0,0)
 
   --game canvas
   love.graphics.setCanvas(world.canvas)
-  love.graphics.clear()
+  love.graphics.clear(0,0,0)
   world.canvas:renderTo(draw)
 
   --entire window
@@ -365,7 +363,7 @@ function love.draw()
   love.graphics.setColor(255, 255, 255)
   love.graphics.printf(world.name, 0, world.offset_y/2, love.graphics:getWidth(), "center")
 
-  love.graphics.setColor(100, 255, 100)
+  love.graphics.setColor(255, 255, 255)
   love.graphics.setLineWidth(1)
   love.graphics.line(world.offset_x - 1, world.offset_y - 1,
                         world.offset_x + world.width + 1, world.offset_y - 1,
