@@ -1,8 +1,8 @@
 function love.conf(t)
    t.console = false
    t.title = "Hello, Love!"
-   t.window.width = 1280
-   t.window.height = 720
+   t.window.width = 550
+   t.window.height = 600
 
    --t.identity = nil                    -- The name of the save directory (string)
    --t.version = "0.10.1"                -- The LÖVE version this game was made for (string)

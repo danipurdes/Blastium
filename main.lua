@@ -1,13 +1,20 @@
 world = {
+  name = "Space Game",
+  canvas = love.graphics.newCanvas(500,500),
+  offset_x = 25,
+  offset_y = 75,
   width = 500,
   height = 500,
   font = love.graphics.newImageFont("assets/example_font.png",
     " abcdefghijklmnopqrstuvwxyz" ..
     "ABCDEFGHIJKLMNOPQRSTUVWXYZ0" ..
-    "123456789.,!?-+/():;%&`'*#=[]\"")
+    "123456789.,!?-+/():;%&`'*#=[]\""),
+  state = "start"
 }
 
 player = {
+  width = 16,
+  height = 16,
   x = 150,
   y = 150,
   xvel = 0,
@@ -19,7 +26,7 @@ player = {
 }
 
 bullet_weapon = {
-  name = "Blaster"
+  name = "Blaster",
   shots = {},
   ammo_max = 25,
   ammo_current = 25,
@@ -28,7 +35,7 @@ bullet_weapon = {
 }
 
 flame_weapon = {
-  name = "Flamethrower"
+  name = "Flamethrower",
   shots = {},
   ammo_max = 400,
   ammo_current = 400,
@@ -37,7 +44,7 @@ flame_weapon = {
 }
 
 shell_weapon = {
-  name = "Flak Cannon"
+  name = "Flak Cannon",
   shots = {},
   ammo_max = 15,
   ammo_current = 15,
@@ -71,239 +78,300 @@ local ACCELERATION = 400
 local DRAG = 100
 local MAX_SPEED = 400
 
+
+
 function love.update(dt)
-  vel_total = math.sqrt(player.xvel * player.xvel + player.yvel * player.yvel)
-  if love.keyboard.isDown("d") then
-    -- rotate clockwise
-    --player.ANGACCEL = ANGACCEL * dt / vel_total
-    player.rotation = player.rotation + (vel_total/MAX_SPEED + 1) * (ROTATION_SPEED * math.pi / 180) * dt;
-  elseif love.keyboard.isDown("a") then
-    -- rotate counter-clockwise
-    --player.ANGACCEL = -ANGACCEL * dt / vel_total
-    player.rotation = player.rotation - (vel_total/MAX_SPEED + 1) * (ROTATION_SPEED * math.pi / 180) * dt;
-  end
+  if world.state == "start" then
+    --
+  elseif world.state == "play" then
+      vel_total = math.sqrt(player.xvel * player.xvel + player.yvel * player.yvel)
+      if love.keyboard.isDown("d") then
+        -- rotate clockwise
+        --player.ANGACCEL = ANGACCEL * dt / vel_total
+        player.rotation = player.rotation + (vel_total/MAX_SPEED + 1) * (ROTATION_SPEED * math.pi / 180) * dt;
+      elseif love.keyboard.isDown("a") then
+        -- rotate counter-clockwise
+        --player.ANGACCEL = -ANGACCEL * dt / vel_total
+        player.rotation = player.rotation - (vel_total/MAX_SPEED + 1) * (ROTATION_SPEED * math.pi / 180) * dt;
+      end
 
-  --player.ANGACCEL = player.ANGACCEL * ANG_RESISTANCE
-  --player.rotation = player.rotation + player.ROTATION_S * dt
-
-
-  if love.keyboard.isDown("s") then
-    -- decelerate / accelerate backwards
-    player.xvel = player.xvel * .9
-    player.yvel = player.yvel * .9
-  end
-
-  if love.keyboard.isDown("w") then
-    -- accelerate
-    player.xvel = player.xvel + ACCELERATION * dt * math.cos(player.rotation)
-    player.yvel = player.yvel + ACCELERATION * dt * math.sin(player.rotation)
-  end
+      --player.ANGACCEL = player.ANGACCEL * ANG_RESISTANCE
+      --player.rotation = player.rotation + player.ROTATION_S * dt
 
 
-  bullet_weapon.firing_rate_current = bullet_weapon.firing_rate_current - dt
-  flame_weapon.firing_rate_current = flame_weapon.firing_rate_current - dt
-  shell_weapon.firing_rate_current = shell_weapon.firing_rate_current - dt
+      if love.keyboard.isDown("s") then
+        -- decelerate / accelerate backwards
+        player.xvel = player.xvel * .9
+        player.yvel = player.yvel * .9
+      end
 
-  bullet_weapon.firing_rate_current = math.min(0, bullet_weapon.firing_rate_current)
-
-
-  if flame_weapon.firing_rate_current <= 0 then
-    flame_weapon.firing_rate_current = 0
-  end
-
-  if shell_weapon.firing_rate_current <= 0 then
-    shell_weapon.firing_rate_current = 0
-  end
-
-  --fire current weapon
-  if love.keyboard.isDown("space") then
-    if player.weapon_index == 0 then
-      fire_bullet_weapon()
-    elseif player.weapon_index == 1 then
-      fire_flame_weapon()
-    elseif player.weapon_index == 2 then
-      fire_shell_weapon()
-    end
-  end
+      if love.keyboard.isDown("w") then
+        -- accelerate
+        player.xvel = player.xvel + ACCELERATION * dt * math.cos(player.rotation)
+        player.yvel = player.yvel + ACCELERATION * dt * math.sin(player.rotation)
+      end
 
 
-  player.xvel = player.xvel - (player.xvel / DRAG)
-  player.yvel = player.yvel - (player.yvel / DRAG)
+      bullet_weapon.firing_rate_current = bullet_weapon.firing_rate_current - dt
+      flame_weapon.firing_rate_current = flame_weapon.firing_rate_current - dt
+      shell_weapon.firing_rate_current = shell_weapon.firing_rate_current - dt
 
-  if vel_total > MAX_SPEED then
-    player.xvel = player.xvel / vel_total * MAX_SPEED
-    player.yvel = player.yvel / vel_total * MAX_SPEED
-  end
-
-  player.x = player.x + player.xvel*dt
-  player.y = player.y + player.yvel*dt
+      bullet_weapon.firing_rate_current = math.max(0, bullet_weapon.firing_rate_current)
 
 
-  if player.x > love.graphics.getWidth() then
-    player.x = 0
-  elseif player.x < 0 then
-    player.x = love.graphics.getWidth()
-  end
+      if flame_weapon.firing_rate_current <= 0 then
+        flame_weapon.firing_rate_current = 0
+      end
 
-  if player.y > love.graphics.getHeight() then
-    player.y = 0
-  elseif player.y < 0 then
-    player.y = love.graphics.getHeight()
-  end
+      if shell_weapon.firing_rate_current <= 0 then
+        shell_weapon.firing_rate_current = 0
+      end
+
+      --fire current weapon
+      if love.keyboard.isDown("space") then
+        if player.weapon_index == 0 then
+          fire_bullet_weapon()
+        elseif player.weapon_index == 1 then
+          fire_flame_weapon()
+        elseif player.weapon_index == 2 then
+          fire_shell_weapon()
+        end
+      end
 
 
-  -- update the shots
-  for i=#bullet_weapon.shots,1,-1 do
-    -- move them up up up
-    local v = bullet_weapon.shots[i]
-    v.x = v.x + dt * math.cos(v.rotation) * v.tv
-    v.y = v.y + dt * math.sin(v.rotation) * v.tv
+      player.xvel = player.xvel - (player.xvel / DRAG)
+      player.yvel = player.yvel - (player.yvel / DRAG)
 
-    if v.x > love.graphics.getWidth() then
-      v.x = v.x - love.graphics.getWidth()
-    elseif v.x < 0 then
-      v.x = v.x + love.graphics.getWidth()
-    end
+      if vel_total > MAX_SPEED then
+        player.xvel = player.xvel / vel_total * MAX_SPEED
+        player.yvel = player.yvel / vel_total * MAX_SPEED
+      end
 
-    if v.y > love.graphics.getHeight() then
-      v.y = v.y - love.graphics.getHeight()
-    elseif v.y < 0 then
-      v.y = v.y + love.graphics.getHeight()
-    end
+      player.x = player.x + player.xvel*dt
+      player.y = player.y + player.yvel*dt
 
-    -- decrease lifespan
-    v.lifespan = v.lifespan - dt
-    -- mark shots that are not visible for removal
-    if v.lifespan <= 0 then
-      table.remove(bullet_weapon.shots, i)
-    end
-  end
 
-  for i=#flame_weapon.shots,1,-1 do
-    -- move them up up up
-    local v = flame_weapon.shots[i]
-    v.x = v.x + dt * math.cos(v.rotation) * v.tvel
-    v.y = v.y + dt * math.sin(v.rotation) * v.tvel
+      if player.x > world.width then
+        player.x = player.x - world.width
+      elseif player.x < 0 then
+        player.x = player.x + world.width
+      end
 
-    if v.x > love.graphics.getWidth() then
-      v.x = v.x - love.graphics.getWidth()
-    elseif v.x < 0 then
-      v.x = v.x + love.graphics.getWidth()
-    end
+      if player.y > world.height then
+        player.y = player.y - world.height
+      elseif player.y < 0 then
+        player.y = player.y + world.height
+      end
 
-    if v.y > love.graphics.getHeight() then
-      v.y = v.y - love.graphics.getHeight()
-    elseif v.y < 0 then
-      v.y = v.y + love.graphics.getHeight()
-    end
 
-    -- decrease lifespan
-    v.lifespan = v.lifespan - dt
-    -- mark shots that are not visible for removal
-    if v.lifespan <= 0 then
-      table.remove(flame_weapon.shots, i)
-    end
-  end
+      -- update the shots
+      for i=#bullet_weapon.shots,1,-1 do
+        -- move them up up up
+        local v = bullet_weapon.shots[i]
+        v.x = v.x + dt * math.cos(v.rotation) * v.tv
+        v.y = v.y + dt * math.sin(v.rotation) * v.tv
 
-  for i=#shell_weapon.shots,1,-1 do
-    -- move them up up up
-    local v = shell_weapon.shots[i]
-    v.x = v.x + dt * math.cos(v.rotation) * v.tvel
-    v.y = v.y + dt * math.sin(v.rotation) * v.tvel
+        if v.x > world.width then
+          v.x = v.x - world.width
+        elseif v.x < 0 then
+          v.x = v.x + world.width
+        end
 
-    if v.x > love.graphics.getWidth() then
-      v.x = v.x - love.graphics.getWidth()
-    elseif v.x < 0 then
-      v.x = v.x + love.graphics.getWidth()
-    end
+        if v.y > world.height then
+          v.y = v.y - world.height
+        elseif v.y < 0 then
+          v.y = v.y + world.height
+        end
 
-    if v.y > love.graphics.getHeight() then
-      v.y = v.y - love.graphics.getHeight()
-    elseif v.y < 0 then
-      v.y = v.y + love.graphics.getHeight()
-    end
+        -- decrease lifespan
+        v.lifespan = v.lifespan - dt
+        -- mark shots that are not visible for removal
+        if v.lifespan <= 0 then
+          table.remove(bullet_weapon.shots, i)
+        end
+      end
 
-    -- decrease lifespan
-    v.lifespan = v.lifespan - dt
-    -- mark shots that are not visible for removal
-    if v.lifespan <= 0 then
-      table.remove(shell_weapon.shots, i)
-    end
+      for i=#flame_weapon.shots,1,-1 do
+        -- move them up up up
+        local v = flame_weapon.shots[i]
+        v.x = v.x + dt * math.cos(v.rotation) * v.tvel
+        v.y = v.y + dt * math.sin(v.rotation) * v.tvel
+
+        if v.x > world.width then
+          v.x = v.x - world.width
+        elseif v.x < 0 then
+          v.x = v.x + world.width
+        end
+
+        if v.y > world.height then
+          v.y = v.y - world.height
+        elseif v.y < 0 then
+          v.y = v.y + world.height
+        end
+
+        -- decrease lifespan
+        v.lifespan = v.lifespan - dt
+        -- mark shots that are not visible for removal
+        if v.lifespan <= 0 then
+          table.remove(flame_weapon.shots, i)
+        end
+      end
+
+      for i=#shell_weapon.shots,1,-1 do
+        -- move them up up up
+        local v = shell_weapon.shots[i]
+        v.x = v.x + dt * math.cos(v.rotation) * v.tvel
+        v.y = v.y + dt * math.sin(v.rotation) * v.tvel
+
+        if v.x > world.width then
+          v.x = v.x - world.width
+        elseif v.x < 0 then
+          v.x = v.x + world.width
+        end
+
+        if v.y > world.height then
+          v.y = v.y - world.height
+        elseif v.y < 0 then
+          v.y = v.y + world.height
+        end
+
+        -- decrease lifespan
+        v.lifespan = v.lifespan - dt
+        -- mark shots that are not visible for removal
+        if v.lifespan <= 0 then
+          table.remove(shell_weapon.shots, i)
+        end
+      end
+  elseif world.state == "end" then
+    --
   end
 end
 
 function love.keypressed(key)
-  if key == "lshift" then
-    player.weapon_index = player.weapon_index + 1
-    player.weapon_index = player.weapon_index % 3
-  end
+  if world.state == "start" then
+      if key == "space" then
+        world.state = "play"
+      end
+  elseif world.state == "play" then
+      if key == "q" then
+        player.weapon_index = player.weapon_index + 1
+        player.weapon_index = player.weapon_index % 3
+      end
 
-  --reload
-  if key == "r" then
-    if player.weapon_index == 0 then
-      bullet_weapon.ammo_current = bullet_weapon.ammo_max;
-    elseif player.weapon_index == 1 then
-      flame_weapon.ammo_current = flame_weapon.ammo_max;
-    elseif player.weapon_index == 2 then
-      shell_weapon.ammo_current = shell_weapon.ammo_max;
-    end
+      --reload
+      if key == "r" then
+        if player.weapon_index == 0 then
+          bullet_weapon.ammo_current = bullet_weapon.ammo_max;
+        elseif player.weapon_index == 1 then
+          flame_weapon.ammo_current = flame_weapon.ammo_max;
+        elseif player.weapon_index == 2 then
+          shell_weapon.ammo_current = shell_weapon.ammo_max;
+        end
+      end
+
+      if key == "h" then
+        world.offset_x = world.offset_x + 1
+      end
+      if key == "n" then
+        world.offset_x = world.offset_x - 1
+      end
+      if key == "j" then
+        world.offset_y = world.offset_y + 1
+      end
+      if key == "m" then
+        world.offset_y = world.offset_y - 1
+      end
+  elseif world.state == "end" then
+      if key == "space" then
+        world.state = "start"
+      end
   end
 end
 
+function draw()
+    --love.graphics.setFont(world.font)
+    love.graphics.setColor(255, 255, 255)
+
+    if world.state == "start" then
+      local start_text = "-PRESS START TO PLAY-"
+      love.graphics.printf(start_text, 0, world.height / 2, world.width, "center")
+    elseif world.state == "play" then
+        local weapon_text = ""
+        if player.weapon_index == 0 then
+          weapon_text = weapon_text .. "Weapon : " .. bullet_weapon.name .. " [" .. player.weapon_index .. "]" .. "\n"
+          weapon_text = weapon_text .. "Active shots : " .. #bullet_weapon.shots .. "\n"
+          weapon_text = weapon_text .. "Ammo : " .. bullet_weapon.ammo_current .. "\n"
+          weapon_text = weapon_text .. "Time to reload : " .. bullet_weapon.firing_rate_current .. " / " .. bullet_weapon.firing_rate_total
+          love.graphics.print(weapon_text, 10, 10)
+        elseif player.weapon_index == 1 then
+          weapon_text = weapon_text .. "Weapon : " .. flame_weapon.name .. " [" .. player.weapon_index .. "]" .. "\n"
+          weapon_text = weapon_text .. "Active shots : " .. #flame_weapon.shots .. "\n"
+          weapon_text = weapon_text .. "Ammo : " .. flame_weapon.ammo_current .. "\n"
+          weapon_text = weapon_text .. "Time to reload : " .. flame_weapon.firing_rate_current .. " / " .. flame_weapon.firing_rate_total
+          love.graphics.print(weapon_text, 10, 10)
+        elseif player.weapon_index == 2 then
+          weapon_text = weapon_text .. "Weapon : " .. shell_weapon.name .. " [" .. player.weapon_index .. "]" .. "\n"
+          weapon_text = weapon_text .. "Active shots : " .. #shell_weapon.shots .. "\n"
+          weapon_text = weapon_text .. "Ammo : " .. shell_weapon.ammo_current .. "\n"
+          weapon_text = weapon_text .. "Time to reload : " .. shell_weapon.firing_rate_current .. " / " .. shell_weapon.firing_rate_total
+          love.graphics.print(weapon_text, 10, 10)
+        end
+
+        love.graphics.draw(player.image, player.x, player.y, player.rotation, 1, 1, 8, 8)
+        if player.x > world.width / 2 then
+            love.graphics.draw(player.image, player.x - world.width, player.y, player.rotation, 1, 1, 8, 8)
+        end
+        if player.x < world.width / 2 then
+            love.graphics.draw(player.image, player.x + world.width, player.y, player.rotation, 1, 1, 8, 8)
+        end
+        if player.y > world.height / 2 then
+            love.graphics.draw(player.image, player.x, player.y - world.height, player.rotation, 1, 1, 8, 8)
+        end
+        if player.y < world.height / 2 then
+            love.graphics.draw(player.image, player.x, player.y + world.height, player.rotation, 1, 1, 8, 8)
+        end
+
+        -- let's draw our heros shots
+        for i,v in ipairs(bullet_weapon.shots) do
+          love.graphics.draw(bullet_round.image, v.x, v.y, v.rotation)
+        end
+
+        for i,v in ipairs(flame_weapon.shots) do
+          love.graphics.draw(flame_round.image, v.x, v.y, v.rotation)
+        end
+
+        for i,v in ipairs(shell_weapon.shots) do
+          love.graphics.draw(shell_round.image, v.x, v.y, v.rotation)
+        end
+    elseif world.state == "end" then
+        --
+    end
+end
+
 function love.draw()
+  love.graphics.clear()
+
+  --game canvas
+  love.graphics.setCanvas(world.canvas)
+  love.graphics.clear()
+  world.canvas:renderTo(draw)
+
+  --entire window
+  love.graphics.setCanvas()
+
+  love.graphics.draw(world.canvas, world.offset_x, world.offset_y)
+
   love.graphics.setFont(world.font)
   love.graphics.setColor(255, 255, 255)
-  love.graphics.print("(" .. math.floor(player.x) .. ", " .. math.floor(player.y) .. ") : " .. math.floor(vel_total), 10, 10, 0, 2, 2)
-  love.graphics.print("Number of bullets : " .. #bullet_weapon.shots, 10, 20)
-  love.graphics.print("Ammo : " .. bullet_weapon.ammo_current, 10, 30)
-  love.graphics.print("Time to reload : " .. bullet_weapon.firing_rate_current .. " / " .. bullet_weapon.firing_rate_total, 10, 40)
-  love.graphics.print("Number of flame bullets : " .. #flame_weapon.shots, 10, 60)
-  love.graphics.print("Flame Ammo : " .. flame_weapon.ammo_current, 10, 70)
-  love.graphics.print("Time to reload flame shot : " .. flame_weapon.firing_rate_current .. " / " .. flame_weapon.firing_rate_total, 10, 80)
-  love.graphics.print("Number of shell bullets : " .. #shell_weapon.shots, 10, 100)
-  love.graphics.print("shell Ammo : " .. shell_weapon.ammo_current, 10, 110)
-  love.graphics.print("Time to reload shell shot : " .. shell_weapon.firing_rate_current .. " / " .. shell_weapon.firing_rate_total, 10, 120)
-  love.graphics.print("Weapon index: " .. player.weapon_index, 10, 140)
+  love.graphics.printf(world.name, 0, world.offset_y/2, love.graphics:getWidth(), "center")
 
-  if player.weapon_index == 0 then
-    love.graphics.print("Weapon: " .. bullet_weapon.name, 10, 140)
-  elseif player.weapon_index == 1 then
-    love.graphics.print("Weapon: " .. flame_weapon.name, 10, 140)
-  elseif player.weapon_index == 2 then
-    love.graphics.print("Weapon: " .. shell_weapon.name, 10, 140)
-  end
-
-
-  --vlambeer mode
-  --if (love.keyboard.isDown("space")) then
-    --love.graphics.translate(2*math.random(), 2*math.random())
-  --end
-
-  love.graphics.draw(player.image, player.x, player.y, player.rotation, 1, 1, 8, 8)
-  if player.x > love.graphics.getWidth() then
-    love.graphics.draw(player.image, player.x - love.graphics.getWidth(), player.y, player.rotation, 1, 1, 8, 8)
-  elseif player.x < 0 then
-    love.graphics.draw(player.image, player.x + love.graphics.getWidth(), player.y, player.rotation, 1, 1, 8, 8)
-  end
-
-  if player.y < love.graphics.getHeight() then
-    love.graphics.draw(player.image, player.x, player.y - love.graphics.getHeight(), player.rotation, 1, 1, 8, 8)
-  elseif player.y > 0 then
-    love.graphics.draw(player.image, player.x, player.y + love.graphics.getHeight(), player.rotation, 1, 1, 8, 8)
-  end
-
-  -- let's draw our heros shots
-  for i,v in ipairs(bullet_weapon.shots) do
-    love.graphics.draw(bullet_round.image, v.x, v.y, v.rotation)
-  end
-
-  for i,v in ipairs(flame_weapon.shots) do
-    love.graphics.draw(flame_round.image, v.x, v.y, v.rotation)
-  end
-
-  for i,v in ipairs(shell_weapon.shots) do
-    love.graphics.draw(shell_round.image, v.x, v.y, v.rotation)
-  end
+  love.graphics.setColor(100, 255, 100)
+  love.graphics.setLineWidth(1)
+  love.graphics.line(world.offset_x - 1, world.offset_y - 1,
+                        world.offset_x + world.width + 1, world.offset_y - 1,
+                        world.offset_x + world.width + 1, world.offset_y + world.height + 1,
+                        world.offset_x - 1, world.offset_y + world.height + 1,
+                        world.offset_x - 1, world.offset_y - 1)
 end
 
 function fire_bullet_weapon()
@@ -356,7 +424,7 @@ function fire_flame_weapon()
     end
 end
 
-function fire_shell_shotgun()
+function fire_shell_weapon()
     if shell_weapon.ammo_current > 0 and shell_weapon.firing_rate_current <= 0 then
         local times = shell_weapon.firing_rate_current
         while times <= 0 and shell_weapon.ammo_current > 0 do
