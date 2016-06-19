@@ -1,7 +1,7 @@
 function love.conf(t)
    t.console = false
-   t.title = "Hello, Love!"
-   t.window.width = 550
+   t.title = "Blastium"
+   t.window.width = 600
    t.window.height = 600
 
    --t.identity = nil                    -- The name of the save directory (string)

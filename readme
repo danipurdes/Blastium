@@ -4,16 +4,13 @@ Summary:
 A small topdown space shooter inspired by Asteroids.
 
 Controls:
-W - accelerate
-S - decelerate
-A - turn left
-D - turn right
-Q - switch weapons
-Space - fire weapon
+W -
+S -
+A -
+D -
+Q - Switch weapons
+Space - Fire weapon
 
 Credits:
 Developer - Daniel Purdes @danielpuedes
 Fonts - Chris Early @chriswearly
-
-Engine:
-Love2d - https://love2d.org/
