@@ -11,7 +11,8 @@ world = {
     "123456789.,!?-+/():;%&`'*#=[]\"",
     2),
   state = "start",
-  score = 0
+  score = 0,
+  music = love.audio.newSource("assets/audio/Busy Signal - Beatwave.wav")
 }
 
 starfield = {
@@ -54,7 +55,7 @@ bullet_weapon = {
 }
 
 shell_weapon = {
-  name = "Flak Cannon",
+  name = "Moonshot",
   shots = {},
   ammo_max = 15,
   ammo_current = 15,
@@ -85,6 +86,12 @@ local ACCELERATION = 400
 local DRAG = 100
 local MAX_SPEED = 400
 
+function love.load()
+  world.music:setLooping(true)
+  world.music:setVolume(.5)
+  world.music:play()
+end
+
 function love.update(dt)
   if world.state == "start" then
         --title animation logic
@@ -108,6 +115,9 @@ function love.update(dt)
             star.y = math.random(600)
             star.velocity = (math.random(10) + 1) * starfield.vel_multiplier
             star.radius = math.random(3)
+            star.color_r = 200+math.random(55)
+            star.color_g = 200+math.random(55)
+            star.color_b = 200+math.random(55)
             table.insert(starfield.stars, star)
         end
 
@@ -243,6 +253,20 @@ function love.update(dt)
           table.remove(shell_weapon.shots, i)
         end
       end
+
+      for i=1,#starfield.stars,1 do
+          local v = starfield.stars[i]
+          v.y = v.y + v.velocity*dt
+          if v.y > 600 then
+              v.y = -5
+              v.x = math.random(600)
+              v.velocity = (math.random(10) + 1) * starfield.vel_multiplier
+              v.radius = math.random(3)
+              v.color_r = 200+math.random(55)
+              v.color_g = 200+math.random(55)
+              v.color_b = 200+math.random(55)
+          end
+      end
   elseif world.state == "end" then
     --
   end
@@ -254,6 +278,7 @@ function love.keypressed(key)
         world.state = "play"
         world.score = 0
       end
+
       if starfield.state == "initial" then
           if key == "p" then
             for i=1,#starfield.stars,1 do
@@ -261,6 +286,11 @@ function love.keypressed(key)
                 starfield.state = "transition"
                 starfield.vel_multiplier = 200
             end
+          end
+      elseif starfield.state == "transition" then
+          if key == "p" then
+            world.state = "play"
+            world.score = 0
           end
       end
   elseif world.state == "play" then
@@ -300,8 +330,11 @@ function love.draw()
   if world.state == "start" then
       for i=1,#starfield.stars,1 do
           local v = starfield.stars[i]
+          love.graphics.setColor(v.color_r,v.color_g,v.color_b)
           love.graphics.rectangle("fill",v.x,v.y,v.radius,v.radius)
       end
+
+      love.graphics.setColor(255, 255, 255);
 
       local start_text = "-PRESS SPACE TO PLAY-"
       love.graphics.setFont(world.title_font)
@@ -311,20 +344,28 @@ function love.draw()
       love.graphics.setFont(world.text_font)
       love.graphics.setColor(text_color, text_color, text_color)
       love.graphics.printf(start_text, 0, world.height / 2 + 24, world.width, "center")
+
   elseif world.state == "play" then
+      love.graphics.setColor(255, 255, 255)
+
+      for i=1,#starfield.stars,1 do
+          local v = starfield.stars[i]
+          love.graphics.setColor(v.color_r, v.color_g, v.color_b);
+          love.graphics.rectangle("fill",v.x,v.y,v.radius,v.radius)
+      end
+
       love.graphics.setColor(255, 255, 255)
 
       drawShots()
       drawPlayer()
 
       local weapon_text = ""
+      love.graphics.setColor(100,100,100)
+      love.graphics.rectangle("fill",10,30,100,10)
       if player.weapon_index == 0 then
         weapon_text = weapon_text .. bullet_weapon.name .. "\n"
-        --weapon_text = weapon_text .. "Active shots : " .. #bullet_weapon.shots .. "\n"
-        --weapon_text = weapon_text .. bullet_weapon.ammo_current .. "\n"
-        --weapon_text = weapon_text .. "Time to reload : " .. bullet_weapon.firing_rate_current .. " / " .. bullet_weapon.firing_rate_total
-        love.graphics.print(weapon_text, 10, 10)
         love.graphics.setColor(255,255,255)
+        love.graphics.print(weapon_text, 10, 10)
         local reload_width = (1 - bullet_weapon.firing_rate_current / bullet_weapon.firing_rate_total) * 100
         if reload_width > 99.99999 then
             love.graphics.setColor(70,250,250)
@@ -332,18 +373,14 @@ function love.draw()
         love.graphics.rectangle("fill",10,30,reload_width,10)
       elseif player.weapon_index == 1 then
         weapon_text = weapon_text .. shell_weapon.name .. "\n"
-        --weapon_text = weapon_text .. "Active shots : " .. #shell_weapon.shots .. "\n"
-        --weapon_text = weapon_text .. shell_weapon.ammo_current .. "\n"
-        --weapon_text = weapon_text .. "Time to reload : " .. shell_weapon.firing_rate_current .. " / " .. shell_weapon.firing_rate_total
-        love.graphics.print(weapon_text, 10, 10)
         love.graphics.setColor(255,255,255)
+        love.graphics.print(weapon_text, 10, 10)
         local reload_width = (1 - shell_weapon.firing_rate_current / shell_weapon.firing_rate_total) * 100
         if reload_width > 99.99999 then
             love.graphics.setColor(70,250,250)
         end
         love.graphics.rectangle("fill",10,30,reload_width,10)
       end
-
 
       love.graphics.setColor(255,255,255)
       love.graphics.setFont(world.text_font)
@@ -441,7 +478,8 @@ function fire_shell_weapon()
                 local shot = {}
                 shot.x = player.x
                 shot.y = player.y
-                shot.rotation = player.rotation - 90 * (math.pi/180) + 180 * (i/9) * (math.pi/180)
+                local spread = 200
+                shot.rotation = player.rotation - spread/2 * (math.pi/180) + spread * (i/9) * (math.pi/180)
 
                 local txv = shell_round.velocity * math.cos(shot.rotation) + math.abs(player.xvel) * math.cos(player.rotation)
                 local tyv = shell_round.velocity * math.sin(shot.rotation) + math.abs(player.yvel) * math.sin(player.rotation)

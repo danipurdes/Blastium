@@ -8,7 +8,7 @@ W - accelerate
 S - decelerate
 A - turn left
 D - turn right
-Q - switch weapons
+Q - switch weapon
 Space - fire weapon
 
 Credits:
@@ -17,3 +17,9 @@ Fonts - Chris Early @chriswearly
 
 Engine:
 Love2d - https://love2d.org/
+
+Art:
+Daniel Purdes
+
+Music:
+Busy Signal - Daniel Purdes
