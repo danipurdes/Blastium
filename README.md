@@ -5,11 +5,13 @@ A small topdown space shooter inspired by Asteroids.
 
 Controls:
 W - accelerate
-S - decelerate
-A - turn left
-D - turn right
-Q - switch weapon
-Space - fire weapon
+S - brake/decelerate
+A - turn left/counter-clockwise
+D - turn right/clockwise
+; - fire blaster
+' - fire moonshot
+P - pause game
+M - mute
 
 Credits:
 Developer - Daniel Purdes @danielpuedes
