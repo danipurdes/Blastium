@@ -1,4 +1,6 @@
 BLASTIUM
+aka BLASTACULAR
+aka BRASS TACKS
 
 Summary:
 A small topdown space shooter inspired by Asteroids.
