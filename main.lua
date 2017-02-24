@@ -1,27 +1,14 @@
-world = {
-  name = "BLASTIUM",
-  width = 600,
-  height = 600,
-  title_font = love.graphics.newImageFont("assets/images/title_font.png",
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZ ",
-    8),
-  text_font = love.graphics.newImageFont("assets/images/example_font_inverted_monospace.png",
-    " abcdefghijklmnopqrstuvwxyz" ..
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZ0" ..
-    "123456789.,!?-+/():;%&`'*#=[]\"",
-    2),
-  hud_font = love.graphics.newImageFont("assets/images/thinpixelfont.png",
-    " ABCDEFGHIJKLMNOPQRSTUVWXYZ", 1),
-  state = "start/open",
-  previous_state = "start/open",
-  score = 0,
-  music = love.audio.newSource("assets/audio/Busy Signal - Beatwave.wav"),
-  mute = false,
-  audio = {
-      volume_max = .5,
-      volume_current = .5
-  }
-}
+world = require "world"
+audio = require "audio"
+player = require "player"
+starfield = require "starfield"
+
+hud = require "hud"
+
+bullet_weapon = require "bullet_weapon"
+shell_weapon = require "shell_weapon"
+bullet_round = require "bullet_round"
+shell_round = require "shell_round"
 
 main_menu = {
     index = 0,
@@ -58,13 +45,6 @@ credits = {
     love_logo = love.graphics.newImage("assets/images/love-logo-0.10-small-white.png")
 }
 
-starfield = {
-    state = "initial",
-    count = 128,
-    stars = {},
-    vel_multiplier = 1
-}
-
 title_anim = {
     lifespan = 1.5,
     state0_color = 255,
@@ -81,66 +61,12 @@ logo_anim = {
     done = false
 }
 
-player = {
-  width = 16,
-  height = 16,
-  x = 150,
-  y = 150,
-  xvel = 0,
-  yvel = 0,
-  rotation = 0,
-  ANGACCEL = 0,
-  image = love.graphics.newImage("assets/images/ship_bosco.png"),
-  weapon_index = 0,
-
-  rotation_speed = 180,
-  acceleration = 400,
-  drag = 100,
-  max_speed = 400
-}
-
-bullet_weapon = {
-  name = "BLASTER",
-  shots = {},
-  ammo_max = 25,
-  ammo_current = 25,
-  firing_rate_total = .3,
-  firing_rate_current = .3,
-  sound = love.audio.newSource("assets/audio/shoot_bullet.wav","static"),
-  index = 0
-}
-
-shell_weapon = {
-  name = "MOONSHOT",
-  shots = {},
-  ammo_max = 15,
-  ammo_current = 15,
-  firing_rate_total = 1.2,
-  firing_rate_current = 1.2,
-  sound = love.audio.newSource("assets/audio/shoot_shell.wav","static"),
-  index = 1
-}
-
-bullet_round = {
-    velocity = 300,
-    mass = 5,
-    lifespan = 2,
-    damage = 1,
-    image = love.graphics.newImage("assets/images/bullet_twin.png")
-}
-
-shell_round = {
-    velocity = 500,
-    mass = 30,
-    lifespan = .16,
-    damage = .34,
-    image = love.graphics.newImage("assets/images/shot.png")
-}
+enemies = {}
 
 enemy = {
     image = love.graphics.newImage("assets/images/enemy_ship.png"),
-    x = 300,
-    y = 300,
+    x = 0,
+    y = 0,
     rotation = 0,
     velX = 0,
     velY = 0,
@@ -158,24 +84,37 @@ screenshake = {
 }
 
 function love.load()
-  world.music:setLooping(true)
-  world.music:setVolume(.25)
-  love.audio.setVolume(world.audio.volume_max)
-  world.audio.volume_current = world.audio.volume_max
-  world.music:play()
+    audio.music:setLooping(true)
+    audio.music:setVolume(.25)
+    love.audio.setVolume(audio.volume_max)
+    audio.volume_current = audio.volume_max
+    audio.music:play()
 
-  --Stars
-  while #starfield.stars < starfield.count do
-      local star = {}
-      star.x = math.random(600)
-      star.y = math.random(600)
-      star.velocity = (math.random(10) + 1) * starfield.vel_multiplier
-      star.radius = math.random(1.5)
-      star.color_r = 200+math.random(55)
-      star.color_g = 200+math.random(55)
-      star.color_b = 200+math.random(55)
-      table.insert(starfield.stars, star)
-  end
+    while #starfield.stars < starfield.count do
+        local star = {}
+        resetStar(star)
+        star.y = math.random(600)
+        table.insert(starfield.stars, star)
+    end
+end
+
+function loadGame()
+    player.x = world.width / 2
+    player.y = world.height / 2
+    world.score = 0
+
+    for i=1,4,1 do
+        local v = {}
+        v.image = enemy.image
+        v.x = enemy.x + 40 * i
+        v.y = enemy.y
+        v.rotation = enemy.rotation
+        v.velX = enemy.velX
+        v.velY = enemy.velY
+        v.speed = enemy.speed
+        v.rotation_influence = enemy.rotation_influence
+        --table.insert(enemies, v)
+    end
 end
 
 function love.update(dt)
@@ -206,60 +145,8 @@ function love.update(dt)
       updateStarfield(dt)
 
   elseif world.state == "play" then
-      vel_total = math.sqrt(math.pow(player.xvel,2) + math.pow(player.yvel,2))
-
-      if love.keyboard.isDown("d") then
-        --player.ANGACCEL = ANGACCEL * dt / vel_total
-        player.rotation = player.rotation + (vel_total/player.max_speed + 1) * (player.rotation_speed * math.pi / 180) * dt;
-      elseif love.keyboard.isDown("a") then
-        --player.ANGACCEL = -ANGACCEL * dt / vel_total
-        player.rotation = player.rotation - (vel_total/player.max_speed + 1) * (player.rotation_speed * math.pi / 180) * dt;
-      end
-
-      --player.ANGACCEL = player.ANGACCEL * ANG_RESISTANCE
-      --player.rotation = player.rotation + player.ROTATION_S * dt
-
-      if love.keyboard.isDown("s") then
-        -- decelerate / accelerate backwards
-        player.xvel = player.xvel * .9
-        player.yvel = player.yvel * .9
-      end
-
-      if love.keyboard.isDown("w") then
-        -- accelerate
-        player.xvel = player.xvel + player.acceleration * dt * math.cos(player.rotation)
-        player.yvel = player.yvel + player.acceleration * dt * math.sin(player.rotation)
-      end
-
-      player.xvel = player.xvel - (player.xvel / player.drag)
-      player.yvel = player.yvel - (player.yvel / player.drag)
-
-      if vel_total > player.max_speed then
-        player.xvel = player.xvel / vel_total * player.max_speed
-        player.yvel = player.yvel / vel_total * player.max_speed
-      end
-
-      player.x = player.x + player.xvel * dt
-      player.y = player.y + player.yvel * dt
-
-      if player.x > world.width then
-        player.x = player.x - world.width
-      elseif player.x < 0 then
-        player.x = player.x + world.width
-      end
-
-      if player.y > world.height then
-        player.y = player.y - world.height
-      elseif player.y < 0 then
-        player.y = player.y + world.height
-      end
-
-      bullet_weapon.firing_rate_current = math.max(0, bullet_weapon.firing_rate_current - dt)
-      shell_weapon.firing_rate_current = math.max(0, shell_weapon.firing_rate_current - dt)
-
-
-      if love.keyboard.isDown(";") then
-        fire_bullet_weapon()
+      if player.active then
+        playerMovement(dt)
       end
 
       for i=#bullet_weapon.shots,1,-1 do
@@ -300,20 +187,43 @@ function love.update(dt)
         end
       end
 
-      enemy.x = enemy.x + enemy.speed * dt * math.cos(enemy.rotation)
-      enemy.y = enemy.y + enemy.speed * dt * math.sin(enemy.rotation)
-      enemy.rotation = enemy.rotation + 2 * dt * enemy.rotation_influence
+      for i=1,#enemies,1 do
+          local v = enemies[i]
+          v.x = v.x + v.speed * dt * math.cos(v.rotation)
+          v.y = v.y + v.speed * dt * math.sin(v.rotation)
+          v.rotation = v.rotation + 2 * dt * v.rotation_influence
 
-      if enemy.x > world.width then
-        enemy.x = enemy.x - world.width
-      elseif enemy.x < 0 then
-        enemy.x = enemy.x + world.width
-      end
+          if v.x > world.width then
+            v.x = v.x - world.width
+          elseif v.x < 0 then
+            v.x = v.x + world.width
+          end
 
-      if enemy.y > world.height then
-        enemy.y = enemy.y - world.height
-      elseif enemy.y < 0 then
-        enemy.y = enemy.y + world.height
+          if v.y > world.height then
+            v.y = v.y - world.height
+          elseif v.y < 0 then
+            v.y = v.y + world.height
+          end
+
+          if circle_overlap(player.x, player.y, 16, v.x, v.y, 16) then
+            player.active = false
+          end
+
+          for j=#bullet_weapon.shots,1,-1 do
+            local s = bullet_weapon.shots[j]
+            if circle_overlap(s.x, s.y, 4, v.x, v.y, 16) then
+              table.remove(enemies, i)
+              table.remove(bullet_weapon.shots, j)
+            end
+          end
+
+          for j=#shell_weapon.shots,1,-1 do
+            local s = shell_weapon.shots[j]
+            if circle_overlap(s.x, s.y, 4, v.x, v.y, 16) then
+              table.remove(enemies, i)
+              table.remove(shell_weapon.shots, j)
+            end
+          end
       end
 
       updateStarfield(dt)
@@ -329,34 +239,9 @@ function love.update(dt)
   end
 end
 
-function updateStarfield(dt)
-    for i=1,#starfield.stars,1 do
-        local v = starfield.stars[i]
-        v.y = v.y + v.velocity*dt
-        if v.y > 600 then
-            v.y = -5
-            v.x = math.random(600)
-            v.velocity = (math.random(10) + 1) * starfield.vel_multiplier
-            v.radius = math.random(1.5)
-            v.color_r = 200+math.random(55)
-            v.color_g = 200+math.random(55)
-            v.color_b = 200+math.random(55)
-        end
-    end
-end
-
 function love.keypressed(key)
   if key == "m" then
-    world.mute = not world.mute
-    if world.mute then
-        --world.music:setVolume(0)
-        love.audio.setVolume(0)
-        world.audio.volume_current = 0
-    else
-        --world.music:setVolume(.5)
-        love.audio.setVolume(world.audio.volume_max)
-        world.audio.volume_current = world.audio.volume_max
-    end
+    toggleMute()
   end
 
   if world.state == "start/open" then
@@ -364,8 +249,6 @@ function love.keypressed(key)
         if not logo_anim.done then
             logo_anim.t = logo_anim.lifespan
             logo_anim.done = true
-            --world.state = "start/main"
-            --world.previous_state = "start/open"
         else
             world.state = "start/main"
             world.previous_state = "start/open"
@@ -399,6 +282,7 @@ function love.keypressed(key)
 
       if key == "space" then
           if main_menu.index == 0 then
+              loadGame()
               world.state = "play"
               world.previous_state = "start/main"
           elseif main_menu.index == 1 then
@@ -452,7 +336,15 @@ function love.keypressed(key)
       end
 
       if key == "v" then
-        enemy.rotation_influence = enemy.rotation_influence * -1
+        for i = 1,#enemies,1 do
+            local v = enemies[i]
+            v.rotation_influence = v.rotation_influence * -1
+        end
+
+      end
+
+      if key == "c" then
+        player.active = not player.active
       end
 
   elseif world.state == "pause" then
@@ -554,11 +446,14 @@ function love.draw()
       love.graphics.translate(screenshake.current_magnitude, 0)
       drawStarfield()
 
-      love.graphics.draw(enemy.image, enemy.x, enemy.y, enemy.rotation, 2, 2, enemy.image:getWidth()/2, enemy.image:getHeight()/2)
+      for i=1,#enemies,1 do
+        local v = enemies[i]
+        love.graphics.draw(v.image, v.x, v.y, v.rotation, 2, 2, v.image:getWidth()/2, v.image:getHeight()/2)
+      end
 
       love.graphics.setColor(255,0,0)
-      love.graphics.points(enemy.x, enemy.y)
-      love.graphics.line(enemy.x + 10 * math.cos(enemy.rotation), enemy.y + 10 * math.sin(enemy.rotation), enemy.x + 20 * math.cos(enemy.rotation), enemy.y + 20 * math.sin(enemy.rotation))
+      --love.graphics.points(enemy.x, enemy.y)
+      --love.graphics.line(enemy.x + 10 * math.cos(enemy.rotation), enemy.y + 10 * math.sin(enemy.rotation), enemy.x + 20 * math.cos(enemy.rotation), enemy.y + 20 * math.sin(enemy.rotation))
 
       drawShots()
       drawPlayer()
@@ -637,29 +532,7 @@ function love.draw()
   end
 end
 
-function drawPlayer()
-    love.graphics.setColor(255,255,255)
-    love.graphics.draw(player.image, player.x, player.y, player.rotation, 1, 1, player.image:getWidth()/2, player.image:getHeight()/2)
-    local px = player.x
-    local py = player.y
-    local hx = world.width/2
-    local hy = world.height/2
-    if ((hx-px)^2+(hy-py)^2)^0.5 > 250 then
-        love.graphics.draw(player.image, player.x - world.width, player.y - world.height, player.rotation, 1, 1, 16, 16)
-        love.graphics.draw(player.image, player.x - world.width, player.y, player.rotation, 1, 1, 16, 16)
-        love.graphics.draw(player.image, player.x - world.width, player.y + world.height, player.rotation, 1, 1, 16, 16)
-
-        love.graphics.draw(player.image, player.x, player.y - world.height, player.rotation, 1, 1, 16, 16)
-        love.graphics.draw(player.image, player.x, player.y + world.height, player.rotation, 1, 1, 16, 16)
-
-        love.graphics.draw(player.image, player.x + world.width, player.y - world.height, player.rotation, 1, 1, 16, 16)
-        love.graphics.draw(player.image, player.x + world.width, player.y, player.rotation, 1, 1, 16, 16)
-        love.graphics.draw(player.image, player.x + world.width, player.y + world.height, player.rotation, 1, 1, 16, 16)
-    end
-end
-
 function drawShots()
-    -- let's draw our heros shots
     for i,v in ipairs(bullet_weapon.shots) do
       love.graphics.draw(bullet_round.image, v.x, v.y, v.rotation)
     end
@@ -669,136 +542,18 @@ function drawShots()
     end
 end
 
-function drawStarfield()
-    for i=1,#starfield.stars,1 do
-        local v = starfield.stars[i]
-        love.graphics.setColor(v.color_r, v.color_g, v.color_b);
-        love.graphics.circle("fill",v.x,v.y,v.radius,6)
-    end
+function distance(x1, y1, x2, y2)
+    local xdist = math.pow(x1-x2, 2)
+    local ydist = math.pow(y1-y2, 2)
+    local dist = math.sqrt(xdist + ydist)
+    return dist
 end
 
-function drawHUD()
-    love.graphics.setFont(world.hud_font)
-    local weapon_text = ""
-
-    weapon_text = bullet_weapon.name .. "\n"
-    local hud_bullet_x = 10
-    local hud_bullet_y = 10
-    love.graphics.setColor(255,255,255)
-    love.graphics.print(weapon_text, hud_bullet_x, hud_bullet_y)
-
-    love.graphics.setColor(100,100,100)
-    love.graphics.rectangle("fill",hud_bullet_x + 100,hud_bullet_y+5,100,10)
-
-    local reload_width = (1 - bullet_weapon.firing_rate_current / bullet_weapon.firing_rate_total) * 100
-    if reload_width > 99.99999 then
-      love.graphics.setColor(50,250,250)
-    else
-      love.graphics.setColor(90,255,255)
-    end
-
-    love.graphics.rectangle("fill",hud_bullet_x + 100,hud_bullet_y+5,reload_width,10)
-
-    weapon_text = shell_weapon.name .. "\n"
-    local hud_shell_x = 10
-    local hud_shell_y = 30
-    love.graphics.setColor(255,255,255)
-    love.graphics.print(weapon_text, hud_shell_x, hud_shell_y)
-
-    love.graphics.setColor(100,100,100)
-    love.graphics.rectangle("fill",hud_shell_x + 100, hud_shell_y+5,100,10)
-
-    reload_width = (1 - shell_weapon.firing_rate_current / shell_weapon.firing_rate_total) * 100
-    if reload_width > 99.99999 then
-      love.graphics.setColor(250,50,50)
-    else
-      love.graphics.setColor(255,90,90)
-    end
-
-    love.graphics.rectangle("fill",hud_shell_x + 100,hud_shell_y+5,reload_width,10)
-
-    love.graphics.setColor(255,255,255)
-    love.graphics.setFont(world.text_font)
-    love.graphics.printf("Score : " .. world.score, 10, 10, world.width - 20, "right")
-end
-
-function fire_bullet_weapon()
-    if bullet_weapon.ammo_current > 0 and bullet_weapon.firing_rate_current <= 0 then
-        local times = bullet_weapon.firing_rate_current
-        while times <= 0 and bullet_weapon.ammo_current > 0 do
-            local tv = math.sqrt(player.xvel * player.xvel + player.yvel * player.yvel) + bullet_round.velocity
-
-            --player.xvel = player.xvel - bullet_round.mass * math.cos(player.rotation)
-            --player.yvel = player.yvel - bullet_round.mass * math.sin(player.rotation)
-
-            local shot1 = {}
-            shot1.x = player.x + 14 * math.cos(player.rotation - 90)
-            shot1.y = player.y + 14 * math.sin(player.rotation - 90)
-            shot1.tvel = tv
-            shot1.rotation = player.rotation
-
-            local txv = shell_round.velocity * math.cos(shot1.rotation) + math.abs(player.xvel) * math.cos(player.rotation)
-            local tyv = shell_round.velocity * math.sin(shot1.rotation) + math.abs(player.yvel) * math.sin(player.rotation)
-            shot1.tvel = math.sqrt(math.pow(txv,2) + math.pow(tyv,2))
-
-            shot1.lifespan = bullet_round.lifespan
-            table.insert(bullet_weapon.shots, shot1)
-
-            local shot2 = {}
-            shot2.x = player.x + 14 * math.cos(player.rotation + 90)
-            shot2.y = player.y + 14 * math.sin(player.rotation + 90)
-            shot2.rotation = player.rotation
-
-            local txv = shell_round.velocity * math.cos(shot2.rotation) + math.abs(player.xvel) * math.cos(player.rotation)
-            local tyv = shell_round.velocity * math.sin(shot2.rotation) + math.abs(player.yvel) * math.sin(player.rotation)
-            shot2.tvel = math.sqrt(math.pow(txv,2) + math.pow(tyv,2))
-
-            shot2.lifespan = bullet_round.lifespan
-            table.insert(bullet_weapon.shots, shot2)
-
-            --bullet_weapon.ammo_current = bullet_weapon.ammo_current - 1
-            times = times + bullet_weapon.firing_rate_total
-        end
-
-        bullet_weapon.firing_rate_current = times
-
-        love.audio.play(bullet_weapon.sound)
-    end
-end
-
-function fire_shell_weapon()
-    if shell_weapon.ammo_current > 0 and shell_weapon.firing_rate_current <= 0 then
-        local times = shell_weapon.firing_rate_current
-        while times <= 0 and shell_weapon.ammo_current > 0 do
-            --player.xvel = player.xvel - shell_round.mass * math.cos(player.rotation)
-            --player.yvel = player.yvel - shell_round.mass * math.sin(player.rotation)
-
-            for i = 0, 9 do
-                local shot = {}
-                shot.x = player.x
-                shot.y = player.y
-                local spread = 200
-                shot.rotation = player.rotation - spread/2 * (math.pi/180) + spread * (i/9) * (math.pi/180)
-
-                local txv = shell_round.velocity * math.cos(shot.rotation) + math.abs(player.xvel) * math.cos(player.rotation)
-                local tyv = shell_round.velocity * math.sin(shot.rotation) + math.abs(player.yvel) * math.sin(player.rotation)
-                shot.tvel = math.sqrt(math.pow(txv,2) + math.pow(tyv,2))
-
-                shot.lifespan = shell_round.lifespan
-                --shell_weapon.shots[#shell_weapon.shots+1] = shot
-                table.insert(shell_weapon.shots, shot)
-            end
-
-            --shell_weapon.shots[#shell_weapon.shots+1] = shot
-
-            --shell_weapon.ammo_current = shell_weapon.ammo_current - 1
-            times = times + shell_weapon.firing_rate_total
-        end
-
-        shell_weapon.firing_rate_current = times
-
-        love.audio.play(shell_weapon.sound)
-    end
+function circle_overlap(x1,y1,r1,x2,y2,r2)
+    local rdist = r1 + r2
+    local tdist = distance(x1, y1, x2, y2)
+    --return tdist - rdist
+    return tdist < rdist
 end
 
 function lerp(a, t, b, m)
