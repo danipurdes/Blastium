@@ -93,4 +93,9 @@ function drawPlayer()
     end
 end
 
+function onPlayerDeath()
+    player.active = false
+    world.state = "end"
+end
+
 return player

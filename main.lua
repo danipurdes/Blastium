@@ -10,21 +10,9 @@ shell_weapon = require "shell_weapon"
 bullet_round = require "bullet_round"
 shell_round = require "shell_round"
 
-main_menu = {
-    index = 0,
-    size = 5,
-    option_0 = "Play",
-    option_1 = "Controls",
-    option_2 = "Options",
-    option_3 = "Credits",
-    option_4 = "Quit Game",
-    indicator_left = love.graphics.newImage("assets/images/pause_indicator_left_new.png"),
-    ind_left_x = 204,
-    indicator_right = love.graphics.newImage("assets/images/pause_indicator_right_new.png"),
-    ind_right_x = 381,
-    ind_base_y = 300,
-    ind_scale_y = 20
-}
+--menus
+main_menu = require "main_menu"
+controls_menu = require "controls_menu"
 
 pause_menu = {
     index = 0,
@@ -113,7 +101,7 @@ function loadGame()
         v.velY = enemy.velY
         v.speed = enemy.speed
         v.rotation_influence = enemy.rotation_influence
-        --table.insert(enemies, v)
+        table.insert(enemies, v)
     end
 end
 
@@ -206,7 +194,8 @@ function love.update(dt)
           end
 
           if circle_overlap(player.x, player.y, 16, v.x, v.y, 16) then
-            player.active = false
+            onPlayerDeath()
+            --player.active = false
           end
 
           for j=#bullet_weapon.shots,1,-1 do
@@ -272,32 +261,7 @@ function love.keypressed(key)
       end
 
   elseif world.state == "start/main" then
-      if key == "up" then
-          main_menu.index = (main_menu.index - 1) % main_menu.size
-      end
-
-      if key == "down" then
-          main_menu.index = (main_menu.index + 1) % main_menu.size
-      end
-
-      if key == "space" then
-          if main_menu.index == 0 then
-              loadGame()
-              world.state = "play"
-              world.previous_state = "start/main"
-          elseif main_menu.index == 1 then
-              world.state = "controls"
-              world.previous_state = "start/main"
-          elseif main_menu.index == 2 then
-              world.state = "options"
-              world.previous_state = "start/main"
-          elseif main_menu.index == 3 then
-              world.state = "credits"
-              world.previous_state = "start/main"
-          elseif main_menu.index == 4 then
-              love.event.quit()
-          end
-      end
+      keypressedMainMenu(key)
 
   elseif world.state == "play" then
       if key == "q" then
@@ -424,22 +388,7 @@ function love.draw()
       end
 
   elseif world.state == "start/main" then
-      drawStarfield()
-
-      love.graphics.setColor(255, 255, 255)
-      love.graphics.setFont(world.title_font)
-      love.graphics.printf(world.name, 0, lerp(logo_anim.start_y, logo_anim.t, logo_anim.end_y, logo_anim.lifespan), world.width, "center")
-      love.graphics.setFont(world.text_font)
-
-      love.graphics.setColor(255, 255, 255);
-      love.graphics.printf(main_menu.option_0, 0, world.height / 2, world.width, "center")
-      love.graphics.printf(main_menu.option_1, 0, world.height / 2 + 20, world.width, "center")
-      love.graphics.printf(main_menu.option_2, 0, world.height / 2 + 40, world.width, "center")
-      love.graphics.printf(main_menu.option_3, 0, world.height / 2 + 60, world.width, "center")
-      love.graphics.printf(main_menu.option_4, 0, world.height / 2 + 80, world.width, "center")
-
-      love.graphics.draw(main_menu.indicator_left, main_menu.ind_left_x, main_menu.ind_base_y + (main_menu.ind_scale_y * main_menu.index), 0)
-      love.graphics.draw(main_menu.indicator_right, main_menu.ind_right_x, main_menu.ind_base_y + (main_menu.ind_scale_y * main_menu.index), 0)
+      drawMainMenu()
 
   elseif world.state == "play" then
       love.graphics.push()
@@ -481,25 +430,7 @@ function love.draw()
       love.graphics.draw(pause_menu.indicator_right, pause_menu.ind_right_x, pause_menu.ind_base_y + (pause_menu.ind_scale_y * pause_menu.index), 0)
 
   elseif world.state == "controls" then
-      drawStarfield()
-
-      love.graphics.setColor(100,100,100,100)
-      love.graphics.rectangle("fill", 0, 0, world.width, world.height)
-
-      love.graphics.setColor(0,0,0,255)
-      love.graphics.rectangle("fill", 50, 50, 500, 500)
-
-      love.graphics.setColor(255, 255, 255)
-      love.graphics.setFont(world.text_font)
-      love.graphics.printf("- Controls -", 0, world.height / 2 - 90, world.width, "center")
-      love.graphics.printf("W - accelerate", world.width / 5, world.height / 2 - 50, world.width, "left")
-      love.graphics.printf("A - turn left/counter-clockwise", world.width / 5, world.height / 2 - 30, world.width, "left")
-      love.graphics.printf("D - turn right/clockwise", world.width / 5, world.height / 2 - 10, world.width, "left")
-      love.graphics.printf("S - brake/decelerate", world.width / 5, world.height / 2 + 10, world.width, "left")
-      love.graphics.printf("; - fire blaster", world.width / 5, world.height / 2 + 30, world.width, "left")
-      love.graphics.printf("' - fire moonshot", world.width / 5, world.height / 2 + 50, world.width, "left")
-      love.graphics.printf("P - pause game", world.width / 5, world.height / 2 + 70, world.width, "left")
-      love.graphics.printf("M - mute", world.width / 5, world.height / 2 + 90, world.width, "left")
+      drawControlsMenu()
 
   elseif world.state == "credits" then
       drawStarfield()
