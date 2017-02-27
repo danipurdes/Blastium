@@ -303,20 +303,17 @@ function love.keypressed(key)
 
   elseif world.state == "options" then
       if key == "space" then
-        world.state = world.previous_state
-        world.previous_state = "options"
+        worldStateChange(world.previous_state)
       end
 
   elseif world.state == "credits" then
     if key == "space" then
-        world.state = world.previous_state
-        world.previous_state = "credits"
+        worldStateChange(world.previous_state)
     end
 
   elseif world.state == "end" then
       if key == "space" then
-        world.state = "start/main"
-        world.previous_state = "end"
+        worldStateChange("start/main")
       end
   end
 end
