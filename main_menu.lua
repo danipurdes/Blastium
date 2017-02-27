@@ -26,17 +26,13 @@ function keypressedMainMenu(key)
     if key == "space" then
         if main_menu.index == 0 then
             loadGame()
-            world.state = "play"
-            world.previous_state = "start/main"
+            worldStateChange("play")
         elseif main_menu.index == 1 then
-            world.state = "controls"
-            world.previous_state = "start/main"
+            worldStateChange("controls")
         elseif main_menu.index == 2 then
-            world.state = "options"
-            world.previous_state = "start/main"
+            worldStateChange("options")
         elseif main_menu.index == 3 then
-            world.state = "credits"
-            world.previous_state = "start/main"
+            worldStateChange("credits")
         elseif main_menu.index == 4 then
             love.event.quit()
         end

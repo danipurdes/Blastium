@@ -181,7 +181,6 @@ function love.update(dt)
 
           if circle_overlap(player.x, player.y, 16, v.x, v.y, 16) then
             onPlayerDeath()
-            --player.active = false
           end
 
           for j=#bullet_weapon.shots,1,-1 do
@@ -300,10 +299,7 @@ function love.keypressed(key)
     keypressedPauseMenu(key)
 
   elseif world.state == "controls" then
-      if key == "space" then
-        world.state = world.previous_state
-        world.previous_state = "controls"
-      end
+    keypressedControlsMenu(key)
 
   elseif world.state == "options" then
       if key == "space" then

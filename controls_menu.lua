@@ -1,5 +1,11 @@
 controls_menu = {}
 
+function keypressedControlsMenu(key)
+    if key == "space" then
+        worldStateChange(world.previous_state)
+    end
+end
+
 function drawControlsMenu()
     drawStarfield()
 
