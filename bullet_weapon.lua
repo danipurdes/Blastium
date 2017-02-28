@@ -7,6 +7,7 @@ bullet_weapon.firing_rate_total = .3
 bullet_weapon.firing_rate_current = .3
 bullet_weapon.sound = love.audio.newSource("assets/audio/shoot_bullet.wav","static")
 bullet_weapon.index = 0
+bullet_weapon.removal_flag = false
 
 function fire_bullet_weapon()
     if bullet_weapon.ammo_current > 0 and bullet_weapon.firing_rate_current <= 0 then

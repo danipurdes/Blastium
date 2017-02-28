@@ -7,6 +7,7 @@ shell_weapon.firing_rate_total = 1.2
 shell_weapon.firing_rate_current = 1.2
 shell_weapon.sound = love.audio.newSource("assets/audio/shoot_shell.wav","static")
 shell_weapon.index = 1
+shell_weapon.removal_flag = false
 
 function fire_shell_weapon()
     if shell_weapon.ammo_current > 0 and shell_weapon.firing_rate_current <= 0 then

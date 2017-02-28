@@ -2,7 +2,6 @@ world = require "world"
 audio = require "audio"
 player = require "player"
 starfield = require "starfield"
-
 hud = require "hud"
 
 bullet_weapon = require "bullet_weapon"
@@ -14,10 +13,7 @@ shell_round = require "shell_round"
 main_menu = require "main_menu"
 controls_menu = require "controls_menu"
 pause_menu = require "pause_menu"
-
-credits = {
-    love_logo = love.graphics.newImage("assets/images/love-logo-0.10-small-white.png")
-}
+credits_menu = require "credits_menu"
 
 title_anim = {
     lifespan = 1.5,
@@ -45,7 +41,16 @@ enemy = {
     velX = 0,
     velY = 0,
     speed = 90,
-    rotation_influence = 1
+    rotation_influence = 1,
+    removal_flag = false
+}
+
+spawn_formation_1 = {
+    x = 300,
+    y = 300,
+    start_rotation = 0,
+    start_magnitude = 100,
+    count = 6
 }
 
 screenshake = {
@@ -73,21 +78,33 @@ function love.load()
 end
 
 function loadGame()
+    player.active = true
     player.x = world.width / 2
     player.y = world.height / 2
+    player.rotation = 0
+    player.velX = 0
+    player.velY = 0
     world.score = 0
 
-    for i=1,4,1 do
-        local v = {}
-        v.image = enemy.image
-        v.x = enemy.x + 40 * i
-        v.y = enemy.y
-        v.rotation = enemy.rotation
-        v.velX = enemy.velX
-        v.velY = enemy.velY
-        v.speed = enemy.speed
-        v.rotation_influence = enemy.rotation_influence
-        table.insert(enemies, v)
+    enemySpawnFormation(1)
+end
+
+function enemySpawnFormation(id)
+    if id == 1 then
+        for i=1,spawn_formation_1.count,1 do
+            local v = {}
+            v.image = enemy.image
+            local angle = 2 * math.pi * i/spawn_formation_1.count
+            v.x = spawn_formation_1.x + spawn_formation_1.start_magnitude * math.cos(angle)
+            v.y = spawn_formation_1.y + spawn_formation_1.start_magnitude * math.sin(angle)
+            v.rotation = angle
+            v.velX = enemy.velX
+            v.velY = enemy.velY
+            v.speed = enemy.speed
+            v.rotation_influence = enemy.rotation_influence
+            v.removal_flag = enemy.removal_flag
+            table.insert(enemies, v)
+        end
     end
 end
 
@@ -181,23 +198,44 @@ function love.update(dt)
 
           if circle_overlap(player.x, player.y, 16, v.x, v.y, 16) then
             onPlayerDeath()
+            break
           end
 
           for j=#bullet_weapon.shots,1,-1 do
             local s = bullet_weapon.shots[j]
             if circle_overlap(s.x, s.y, 4, v.x, v.y, 16) then
-              table.remove(enemies, i)
-              table.remove(bullet_weapon.shots, j)
+              v.removal_flag = true
+              s.removal_flag = true
+              world.score = world.score + 1
             end
           end
 
           for j=#shell_weapon.shots,1,-1 do
             local s = shell_weapon.shots[j]
             if circle_overlap(s.x, s.y, 4, v.x, v.y, 16) then
-              table.remove(enemies, i)
-              table.remove(shell_weapon.shots, j)
+              v.removal_flag = true
+              s.removal_flag = true
+              world.score = world.score + 1
             end
           end
+      end
+
+      for i=#enemies, 1, -1 do
+        if enemies[i].removal_flag then
+            table.remove(enemies, i)
+        end
+      end
+
+      for i=#bullet_weapon.shots, 1, -1 do
+        if bullet_weapon.shots[i].removal_flag then
+            table.remove(bullet_weapon.shots, i)
+        end
+      end
+
+      for i=#shell_weapon.shots, 1, -1 do
+        if shell_weapon.shots[i].removal_flag then
+            table.remove(shell_weapon.shots, i)
+        end
       end
 
       updateStarfield(dt)
@@ -224,8 +262,7 @@ function love.keypressed(key)
             logo_anim.t = logo_anim.lifespan
             logo_anim.done = true
         else
-            world.state = "start/main"
-            world.previous_state = "start/open"
+            worldStateChange("start/main")
         end
       end
 
@@ -239,8 +276,7 @@ function love.keypressed(key)
           end
       elseif starfield.state == "transition" then
           if key == "p" then
-            world.state = "play"
-            world.previous_state = "start/main"
+            worldStateChange("play")
             world.score = 0
           end
       end
@@ -271,13 +307,11 @@ function love.keypressed(key)
       end
 
       if key == "l" then
-        world.state = "end"
-        world.previous_state = "play"
+        worldStateChange("end")
       end
 
       if key == "p" then
-        world.state = "pause"
-        world.previous_state = "play"
+        worldStateChange("pause")
       end
 
       if key == "b" then
@@ -307,9 +341,7 @@ function love.keypressed(key)
       end
 
   elseif world.state == "credits" then
-    if key == "space" then
-        worldStateChange(world.previous_state)
-    end
+    keypressedCreditsMenu(key)
 
   elseif world.state == "end" then
       if key == "space" then
@@ -318,9 +350,20 @@ function love.keypressed(key)
   end
 end
 
+function despawnEnemies()
+    enemies = {}
+end
+
+function despawnBullets()
+    bullet_weapon.shots = {}
+end
+
+function despawnShells()
+    shell_weapon.shots = {}
+end
+
 function love.draw()
   love.graphics.clear(0,0,0)
-
   love.graphics.setColor(255, 255, 255)
 
   if world.state == "start/open" then
@@ -367,24 +410,7 @@ function love.draw()
       drawControlsMenu()
 
   elseif world.state == "credits" then
-      drawStarfield()
-
-      love.graphics.setColor(100,100,100,100)
-      love.graphics.rectangle("fill", 0, 0, world.width, world.height)
-
-      love.graphics.setColor(0,0,0,255)
-      love.graphics.rectangle("fill", 50, 50, 500, 500)
-
-      love.graphics.setColor(255,255,255)
-      love.graphics.setFont(world.title_font)
-      love.graphics.printf(world.name, 0, 85, world.width, "center");
-      love.graphics.setFont(world.text_font)
-      love.graphics.printf("- DEVELOPER -", 0, 190, world.width, "center");
-      love.graphics.printf("Daniel Purdes", 0, 210, world.width, "center");
-      love.graphics.printf("- LOGO FONT -", 0, 250, world.width, "center");
-      love.graphics.printf("Chris Early", 0, 270, world.width, "center");
-      love.graphics.printf("Made with", 0, 420, world.width, "center")
-      love.graphics.draw(credits.love_logo, world.width/2 - credits.love_logo:getWidth()/2, 440)
+      drawCreditsMenu()
 
   elseif world.state == "end" then
       drawStarfield()

@@ -1,7 +1,7 @@
 player = {}
 player.active = true
-player.x = 150
-player.y = 150
+player.x = 0
+player.y = 0
 player.xvel = 0
 player.yvel = 0
 player.rotation = 0
@@ -95,7 +95,10 @@ end
 
 function onPlayerDeath()
     player.active = false
-    world.state = "end"
+    worldStateChange("end")
+    despawnEnemies()
+    despawnBullets()
+    despawnShells()
 end
 
 return player
