@@ -50,7 +50,17 @@ spawn_formation_1 = {
     y = 300,
     start_rotation = 0,
     start_magnitude = 100,
-    count = 6
+    count = 6,
+    mode = "rotate"
+}
+
+spawn_formation_2 = {
+    x = 300,
+    y = 0,
+    start_rotation = 2*math.pi/3,
+    start_magnitude = 0,
+    count = 6,
+    mode = "forward"
 }
 
 screenshake = {
@@ -87,6 +97,7 @@ function loadGame()
     world.score = 0
 
     enemySpawnFormation(1)
+    enemySpawnFormation(2)
 end
 
 function enemySpawnFormation(id)
@@ -103,6 +114,27 @@ function enemySpawnFormation(id)
             v.speed = enemy.speed
             v.rotation_influence = enemy.rotation_influence
             v.removal_flag = enemy.removal_flag
+            v.mode = spawn_formation_1.mode
+            table.insert(enemies, v)
+        end
+    end
+
+    if id == 2 then
+        for i=1,spawn_formation_2.count,1 do
+            local v = {}
+            v.image = enemy.image
+            --local angle = 2 * math.pi * i/spawn_formation_1.count
+            --v.x = spawn_formation_1.x + spawn_formation_1.start_magnitude * math.cos(angle)
+            --v.y = spawn_formation_1.y + spawn_formation_1.start_magnitude * math.sin(angle)
+            v.x = spawn_formation_2.x + 50 * (i - 1)
+            v.y = spawn_formation_2.y
+            v.rotation = spawn_formation_2.start_rotation
+            v.velX = enemy.velX
+            v.velY = enemy.velY
+            v.speed = enemy.speed
+            v.rotation_influence = enemy.rotation_influence
+            v.removal_flag = enemy.removal_flag
+            v.mode = spawn_formation_2.mode
             table.insert(enemies, v)
         end
     end
@@ -182,7 +214,9 @@ function love.update(dt)
           local v = enemies[i]
           v.x = v.x + v.speed * dt * math.cos(v.rotation)
           v.y = v.y + v.speed * dt * math.sin(v.rotation)
-          v.rotation = v.rotation + 2 * dt * v.rotation_influence
+          if v.mode == "rotate" then
+            v.rotation = v.rotation + 2 * dt * v.rotation_influence
+          end
 
           if v.x > world.width then
             v.x = v.x - world.width
