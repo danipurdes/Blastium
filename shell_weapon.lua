@@ -9,12 +9,28 @@ shell_weapon.sound = love.audio.newSource("assets/audio/shoot_shell.wav","static
 shell_weapon.index = 1
 shell_weapon.removal_flag = false
 
+function updateShellWeapon(dt)
+    for i=#shell_weapon.shots,1,-1 do
+      local v = shell_weapon.shots[i]
+      v.x = v.x + dt * math.cos(v.rotation) * v.tvel
+      v.y = v.y + dt * math.sin(v.rotation) * v.tvel
+
+      v.lifespan = v.lifespan - dt
+
+      if v.lifespan <= 0 then
+        table.remove(shell_weapon.shots, i)
+      elseif v.x < -10 or v.x > world.width + 10 or v.y < -10 or v.y > world.height + 10 then
+        table.remove(bullet_weapon.shots, i)
+      end
+    end
+end
+
 function fire_shell_weapon()
     if shell_weapon.ammo_current > 0 and shell_weapon.firing_rate_current <= 0 then
         local times = shell_weapon.firing_rate_current
         while times <= 0 and shell_weapon.ammo_current > 0 do
-            --player.xvel = player.xvel - shell_round.mass * math.cos(player.rotation)
-            --player.yvel = player.yvel - shell_round.mass * math.sin(player.rotation)
+            player.xvel = player.xvel - shell_round.mass * math.cos(player.rotation)
+            player.yvel = player.yvel - shell_round.mass * math.sin(player.rotation)
 
             for i = 0, 9 do
                 local shot = {}
@@ -41,6 +57,12 @@ function fire_shell_weapon()
         shell_weapon.firing_rate_current = times
 
         love.audio.play(shell_weapon.sound)
+    end
+end
+
+function drawShellRounds()
+    for i,v in ipairs(shell_weapon.shots) do
+      love.graphics.draw(shell_round.image, v.x, v.y, v.rotation, 1, 1, shell_round.image:getWidth()/2, shell_round.image:getHeight()/2)
     end
 end
 

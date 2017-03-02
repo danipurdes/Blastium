@@ -4,7 +4,6 @@ function drawHUD()
     love.graphics.setColor(0,0,0,100)
     love.graphics.rectangle("fill", 0, 0, world.width, 50)
 
-
     drawWeaponInfo(bullet_weapon.name, 10, 10,
                     bullet_weapon.firing_rate_current, bullet_weapon.firing_rate_total,
                     50, 250, 250,

@@ -1,9 +1,13 @@
+utilities = require "utilities"
+
 world = require "world"
 audio = require "audio"
 player = require "player"
 starfield = require "starfield"
 hud = require "hud"
+screenshake = require "screenshake"
 
+--weapons
 bullet_weapon = require "bullet_weapon"
 shell_weapon = require "shell_weapon"
 bullet_round = require "bullet_round"
@@ -63,15 +67,6 @@ spawn_formation_2 = {
     mode = "forward"
 }
 
-screenshake = {
-    active = false,
-    magnitude = 5,
-    current_magnitude = 0,
-    lifespan = 1,
-    period = 0.01,
-    age = 0
-}
-
 function love.load()
     audio.music:setLooping(true)
     audio.music:setVolume(.25)
@@ -96,7 +91,7 @@ function loadGame()
     player.yvel = 0
     world.score = 0
 
-    --enemySpawnFormation(1)
+    enemySpawnFormation(1)
     --enemySpawnFormation(2)
 
     screenshake.active = false
@@ -175,43 +170,10 @@ function love.update(dt)
         playerMovement(dt)
       end
 
-      for i=#bullet_weapon.shots,1,-1 do
-        local v = bullet_weapon.shots[i]
-        v.x = v.x + dt * math.cos(v.rotation) * v.tvel
-        v.y = v.y + dt * math.sin(v.rotation) * v.tvel
+      updateBulletWeapon(dt)
+      updateShellWeapon(dt)
 
-        v.lifespan = v.lifespan - dt
-
-        if v.lifespan <= 0 then
-          table.remove(bullet_weapon.shots, i)
-        elseif v.x < -10 or v.x > world.width + 10 or v.y < -10 or v.y > world.height + 10 then
-          table.remove(bullet_weapon.shots, i)
-        end
-      end
-
-      for i=#shell_weapon.shots,1,-1 do
-        local v = shell_weapon.shots[i]
-        v.x = v.x + dt * math.cos(v.rotation) * v.tvel
-        v.y = v.y + dt * math.sin(v.rotation) * v.tvel
-
-        v.lifespan = v.lifespan - dt
-
-        if v.lifespan <= 0 then
-          table.remove(shell_weapon.shots, i)
-        elseif v.x < -10 or v.x > world.width + 10 or v.y < -10 or v.y > world.height + 10 then
-          table.remove(bullet_weapon.shots, i)
-        end
-      end
-
-      if screenshake.active then
-        screenshake.age = screenshake.age + dt
-        screenshake.current_magnitude = screenshake.magnitude * math.exp(-(screenshake.age*2)) * math.sin((1/screenshake.period) * math.pi * (screenshake.age/screenshake.lifespan))
-        if screenshake.age > screenshake.lifespan then
-            screenshake.active = false
-            screenshake.age = 0
-            screenshake.current_magnitude = 0
-        end
-      end
+      updateScreenshake(dt)
 
       for i=1,#enemies,1 do
           local v = enemies[i]
@@ -244,6 +206,7 @@ function love.update(dt)
               v.removal_flag = true
               s.removal_flag = true
               world.score = world.score + 1
+              initiateScreenshake()
             end
           end
 
@@ -253,6 +216,7 @@ function love.update(dt)
               v.removal_flag = true
               s.removal_flag = true
               world.score = world.score + 1
+              initiateScreenshake()
             end
           end
       end
@@ -433,7 +397,8 @@ function love.draw()
 
       love.graphics.setColor(255,0,0)
 
-      drawShots()
+      drawBulletRounds()
+      drawShellRounds()
       drawPlayer()
       drawHUD()
       love.graphics.printf(love.timer.getFPS(), 20, world.height - 40, world.width);
@@ -457,33 +422,4 @@ function love.draw()
       love.graphics.printf(end_text, 0, world.height / 2 - 10, world.width, "center")
       love.graphics.printf(score_text, 0, world.height / 2 + 10, world.width, "center")
   end
-end
-
-function drawShots()
-    for i,v in ipairs(bullet_weapon.shots) do
-      love.graphics.draw(bullet_round.image, v.x, v.y, v.rotation)
-    end
-
-    for i,v in ipairs(shell_weapon.shots) do
-      love.graphics.draw(shell_round.image, v.x, v.y, v.rotation)
-    end
-end
-
-function distance(x1, y1, x2, y2)
-    local xdist = math.pow(x1-x2, 2)
-    local ydist = math.pow(y1-y2, 2)
-    local dist = math.sqrt(xdist + ydist)
-    return dist
-end
-
-function circle_overlap(x1,y1,r1,x2,y2,r2)
-    local rdist = r1 + r2
-    local tdist = distance(x1, y1, x2, y2)
-    --return tdist - rdist
-    return tdist < rdist
-end
-
-function lerp(a, t, b, m)
-    local value = math.abs(b - a) * (t / m) + math.min(a, b)
-    return value
 end
