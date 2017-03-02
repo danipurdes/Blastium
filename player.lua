@@ -10,7 +10,7 @@ player.image = love.graphics.newImage("assets/images/ship_bosco.png")
 player.weapon_index = 0
 player.rotation_speed = 180
 player.acceleration = 400
-player.drag = 100
+player.drag = 399
 player.max_speed = 400
 
 function playerMovement(dt)
@@ -27,42 +27,83 @@ function playerMovement(dt)
     --player.ANGACCEL = player.ANGACCEL * ANG_RESISTANCE
     --player.rotation = player.rotation + player.ROTATION_S * dt
 
-    if love.keyboard.isDown("s") then
-        -- decelerate / accelerate backwards
-        player.xvel = player.xvel * .9
-        player.yvel = player.yvel * .9
-    end
 
-    if love.keyboard.isDown("w") then
-        -- accelerate
-        player.xvel = player.xvel + player.acceleration * dt * math.cos(player.rotation)
-        player.yvel = player.yvel + player.acceleration * dt * math.sin(player.rotation)
-    end
 
     if love.keyboard.isDown("u") then
-        -- accelerate
-        --player.xvel = player.xvel + dt * math.cos(player.rotation + 3 * math.pi / 2)
-        --player.yvel = player.yvel + dt * math.sin(player.rotation + 3 * math.pi / 2)
-        --player.rotation = player.rotation + dt * (2 * math.pi)
+        -- orbit
 
-        local tangent = player.rotation + (3 * math.pi / 2)
-        local xVelTangent = math.cos(tangent)
-        local yVelTangent = math.sin(tangent)
-        player.xvel = xVelTangent * 40
-        player.yvel = yVelTangent * 40
+        -- find the center of the orbit point
+        local distanceToOrbitCenter = 300 --60
+        local orbitCenterX = player.x + math.cos(player.rotation) * distanceToOrbitCenter
+        local orbitCenterY = player.y + math.sin(player.rotation) * distanceToOrbitCenter
 
+        -- find the destination rotation
+        local rotVel = math.pi / 3
+        local orbitRot = math.pi + player.rotation
+        orbitRot = orbitRot + rotVel * dt
+        player.rotation = math.pi + orbitRot
+
+        -- set the ship to be at the destination rotation
+        --player.x = math.cos(orbitRot) * distanceToOrbitCenter + orbitCenterX
+        --player.y = math.sin(orbitRot) * distanceToOrbitCenter + orbitCenterY
+
+        -- flub the velocity
+        local tangentVectorAngle = (player.rotation + (math.pi + math.pi / 2))
+        local linearVel = rotVel * (distanceToOrbitCenter)
+        player.xvel = player.xvel + dt * math.cos(tangentVectorAngle) * linearVel
+        player.yvel = player.yvel + dt * math.sin(tangentVectorAngle) * linearVel
     end
 
-    --player.xvel = player.xvel - (player.xvel / player.drag)
-    --player.yvel = player.yvel - (player.yvel / player.drag)
+    if love.keyboard.isDown("i") then
+        -- orbit
 
-    if vel_total > player.max_speed then
-        player.xvel = player.xvel / vel_total * player.max_speed
-        player.yvel = player.yvel / vel_total * player.max_speed
+        -- find the center of the orbit point
+        local distanceToOrbitCenter = 300 --60
+        local orbitCenterX = player.x + math.cos(player.rotation) * distanceToOrbitCenter
+        local orbitCenterY = player.y + math.sin(player.rotation) * distanceToOrbitCenter
+
+        -- find the destination rotation
+        local rotVel = math.pi
+        local orbitRot = math.pi + player.rotation
+        orbitRot = orbitRot - rotVel * dt
+        player.rotation = math.pi + orbitRot
+
+        -- set the ship to be at the destination rotation
+        --player.x = math.cos(orbitRot) * distanceToOrbitCenter + orbitCenterX
+        --player.y = math.sin(orbitRot) * distanceToOrbitCenter + orbitCenterY
+
+        -- flub the velocity
+        local tangentVectorAngle = (player.rotation + (math.pi + math.pi / 2))
+        local linearVel = rotVel * (distanceToOrbitCenter)
+        player.xvel = player.xvel - dt * math.cos(tangentVectorAngle) * linearVel
+        player.yvel = player.yvel - dt * math.sin(tangentVectorAngle) * linearVel
     end
 
-    player.x = player.x + player.xvel * dt
-    player.y = player.y + player.yvel * dt
+        -- forward backward
+        if love.keyboard.isDown("s") then
+            -- decelerate / accelerate backwards
+            player.xvel = player.xvel * .9
+            player.yvel = player.yvel * .9
+        end
+
+        if love.keyboard.isDown("w") then
+            -- accelerate
+            player.xvel = player.xvel + player.acceleration * dt * math.cos(player.rotation)
+            player.yvel = player.yvel + player.acceleration * dt * math.sin(player.rotation)
+        end
+
+        --dragrate = player.drag * dt
+        --love.graphics.printf(dragrate, 40, 100, world.width);
+        player.xvel = (player.xvel * .9975)--player.drag * dt)
+        player.yvel = (player.yvel * .9975)--player.drag * dt)
+
+        if vel_total > player.max_speed then
+            player.xvel = player.xvel / vel_total * player.max_speed
+            player.yvel = player.yvel / vel_total * player.max_speed
+        end
+
+        player.x = player.x + player.xvel * dt
+        player.y = player.y + player.yvel * dt
 
     if player.x > world.width then
         player.x = player.x - world.width
@@ -106,6 +147,9 @@ function drawPlayer()
         end
 
         love.graphics.points(player.x + 60 * math.cos(player.rotation), player.y + 60 * math.sin(player.rotation))
+        local speedText = player.xvel .. ", " .. player.yvel
+        love.graphics.setColor(255,255,255)
+        love.graphics.printf(speedText, 20, 200, world.width)
     end
 end
 

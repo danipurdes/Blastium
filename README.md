@@ -1,17 +1,9 @@
-
-*****   *        ****    *****  ******  ******  *    *  *    *  *****
-*    *  *       *    *  *         *       *     *    *  **  **  *  *
-*****   *       ******   ****     *       *     *    *  * ** *  * *
-*    *  *       *    *       *    *       *     *    *  *    *  **
-*    *  *       *    *       *    *       *     *    *  *    *  
-*****   ******  *    *  *****     *     ******   ****   *    *  **
-
 Blastium
 aka Blastacular
 aka Brass Tacks
 
 Summary:
-A small topdown space shooter inspired by Asteroids.
+A topdown space shooter inspired by Asteroids & Dark Souls.
 
 Controls:
   Ship Movement:
@@ -30,6 +22,7 @@ Controls:
 
 Credits:
   Developer - Daniel Purdes @danielpuedes
+  Technical Consultant - Scott Munro @scoop
   Fonts - Chris Early @chriswearly
 
 Engine:

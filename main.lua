@@ -400,7 +400,7 @@ function despawnShells()
 end
 
 function love.draw()
-  love.graphics.clear(0,0,0)
+  love.graphics.clear(20,20,20)
   love.graphics.setColor(255, 255, 255)
 
   if world.state == "start/open" then
@@ -436,6 +436,7 @@ function love.draw()
       drawShots()
       drawPlayer()
       drawHUD()
+      love.graphics.printf(love.timer.getFPS(), 20, world.height - 40, world.width);
       love.graphics.pop()
 
   elseif world.state == "pause" then
