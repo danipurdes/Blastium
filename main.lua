@@ -91,13 +91,16 @@ function loadGame()
     player.active = true
     player.x = world.width / 2
     player.y = world.height / 2
-    player.rotation = 0
-    player.velX = 0
-    player.velY = 0
+    player.rotation = 3 * math.pi / 2
+    player.xvel = 0
+    player.yvel = 0
     world.score = 0
 
-    enemySpawnFormation(1)
-    enemySpawnFormation(2)
+    --enemySpawnFormation(1)
+    --enemySpawnFormation(2)
+
+    screenshake.active = false
+    screenshake.current_magnitude = 0
 end
 
 function enemySpawnFormation(id)
@@ -429,8 +432,6 @@ function love.draw()
       end
 
       love.graphics.setColor(255,0,0)
-      --love.graphics.points(enemy.x, enemy.y)
-      --love.graphics.line(enemy.x + 10 * math.cos(enemy.rotation), enemy.y + 10 * math.sin(enemy.rotation), enemy.x + 20 * math.cos(enemy.rotation), enemy.y + 20 * math.sin(enemy.rotation))
 
       drawShots()
       drawPlayer()

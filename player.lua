@@ -39,8 +39,22 @@ function playerMovement(dt)
         player.yvel = player.yvel + player.acceleration * dt * math.sin(player.rotation)
     end
 
-    player.xvel = player.xvel - (player.xvel / player.drag)
-    player.yvel = player.yvel - (player.yvel / player.drag)
+    if love.keyboard.isDown("u") then
+        -- accelerate
+        --player.xvel = player.xvel + dt * math.cos(player.rotation + 3 * math.pi / 2)
+        --player.yvel = player.yvel + dt * math.sin(player.rotation + 3 * math.pi / 2)
+        --player.rotation = player.rotation + dt * (2 * math.pi)
+
+        local tangent = player.rotation + (3 * math.pi / 2)
+        local xVelTangent = math.cos(tangent)
+        local yVelTangent = math.sin(tangent)
+        player.xvel = xVelTangent * 40
+        player.yvel = yVelTangent * 40
+
+    end
+
+    --player.xvel = player.xvel - (player.xvel / player.drag)
+    --player.yvel = player.yvel - (player.yvel / player.drag)
 
     if vel_total > player.max_speed then
         player.xvel = player.xvel / vel_total * player.max_speed
@@ -90,6 +104,8 @@ function drawPlayer()
             love.graphics.draw(player.image, player.x + world.width, player.y, player.rotation, 1, 1, 16, 16)
             love.graphics.draw(player.image, player.x + world.width, player.y + world.height, player.rotation, 1, 1, 16, 16)
         end
+
+        love.graphics.points(player.x + 60 * math.cos(player.rotation), player.y + 60 * math.sin(player.rotation))
     end
 end
 
