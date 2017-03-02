@@ -15,12 +15,12 @@ function drawHUD()
                     255, 90, 90)
 
     love.graphics.setColor(255,255,255)
-    love.graphics.setFont(world.text_font)
+    love.graphics.setFont(fonts.text_font)
     love.graphics.printf("Score : " .. world.score, 10, 10, world.width - 20, "right")
 end
 
 function drawWeaponInfo(name, x, y, frc, frt, r0, g0, b0, r1, g1, b1)
-    love.graphics.setFont(world.hud_font)
+    love.graphics.setFont(fonts.hud_font)
 
     love.graphics.setColor(255,255,255)
     love.graphics.print(name, x, y)

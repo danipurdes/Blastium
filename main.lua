@@ -1,6 +1,7 @@
 utilities = require "utilities"
 
 world = require "world"
+fonts = require "fonts"
 audio = require "audio"
 player = require "player"
 starfield = require "starfield"
@@ -241,6 +242,9 @@ function love.update(dt)
 
       updateStarfield(dt)
 
+  elseif world.state == "pause" then
+    updatePauseMenu(dt)
+
   elseif world.state == "controls" then
     updateStarfield(dt)
 
@@ -371,9 +375,9 @@ function love.draw()
       drawStarfield()
 
       love.graphics.setColor(255, 255, 255)
-      love.graphics.setFont(world.title_font)
+      love.graphics.setFont(fonts.title_font)
       love.graphics.printf(world.name, 0, lerp(logo_anim.start_y, logo_anim.t, logo_anim.end_y, logo_anim.lifespan), world.width, "center")
-      love.graphics.setFont(world.text_font)
+      love.graphics.setFont(fonts.text_font)
 
       if logo_anim.done then
           local start_text = "- PRESS SPACE TO PLAY -"
@@ -397,11 +401,10 @@ function love.draw()
 
       love.graphics.setColor(255,0,0)
 
-      drawBulletRounds()
-      drawShellRounds()
+      drawShots()
       drawPlayer()
       drawHUD()
-      love.graphics.printf(love.timer.getFPS(), 20, world.height - 40, world.width);
+      love.graphics.printf("fps " .. love.timer.getFPS(), 20, world.height - 40, world.width);
       love.graphics.pop()
 
   elseif world.state == "pause" then
@@ -418,8 +421,13 @@ function love.draw()
 
       local end_text = "- GAME OVER -"
       local score_text = "SCORE : " .. world.score
-      love.graphics.setFont(world.text_font)
+      love.graphics.setFont(fonts.text_font)
       love.graphics.printf(end_text, 0, world.height / 2 - 10, world.width, "center")
       love.graphics.printf(score_text, 0, world.height / 2 + 10, world.width, "center")
   end
+end
+
+function drawShots()
+    drawBulletRounds()
+    drawShellRounds()
 end

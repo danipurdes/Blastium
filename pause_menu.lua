@@ -13,6 +13,10 @@ pause_menu.ind_right_x = 381
 pause_menu.ind_base_y = 300
 pause_menu.ind_scale_y = 20
 
+function updatePauseMenu(dt)
+    updateStarfield(dt)
+end
+
 function keypressedPauseMenu(key)
     if key == "p" then
         world.state = "play"
@@ -52,6 +56,9 @@ function drawPauseMenu()
 
     love.graphics.setColor(100,100,100,100)
     love.graphics.rectangle("fill", 0, 0, world.width, world.height)
+
+    love.graphics.setColor(0,0,0,255)
+    love.graphics.rectangle("fill", 50, 50, 500, 500)
 
     love.graphics.setColor(255, 255, 255);
     local pause_text = "- PAUSED -"

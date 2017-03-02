@@ -16,7 +16,7 @@ function drawControlsMenu()
     love.graphics.rectangle("fill", 50, 50, 500, 500)
 
     love.graphics.setColor(255, 255, 255)
-    love.graphics.setFont(world.text_font)
+    love.graphics.setFont(fonts.text_font)
     love.graphics.printf("- Controls -", 0, world.height / 2 - 90, world.width, "center")
     love.graphics.printf("W - accelerate", world.width / 5, world.height / 2 - 50, world.width, "left")
     love.graphics.printf("A - turn left/counter-clockwise", world.width / 5, world.height / 2 - 30, world.width, "left")
