@@ -12,6 +12,7 @@ player.rotation_speed = 180
 player.acceleration = 400
 player.drag = 399
 player.max_speed = 400
+player.health = 5
 
 function playerMovement(dt)
     vel_total = math.sqrt(math.pow(player.xvel,2) + math.pow(player.yvel,2))
@@ -151,6 +152,20 @@ function drawPlayer()
         love.graphics.setColor(255,255,255)
         love.graphics.printf(speedText, 20, 200, world.width)
     end
+end
+
+function onPlayerDamage(x, y)
+    local xVect = player.x - x
+    local yVect = player.y - y
+    local mVect = distance(player.x, player.y, x, y)
+    local xMag = xVect / mVect
+    local yMag = yVect / mVect
+    local xImp = xMag * 50
+    local yImp = yMag * 50
+    player.xvel = player.xvel + xImp
+    player.yvel = player.yvel + yImp
+
+    player.health = player.health - 1
 end
 
 function onPlayerDeath()
