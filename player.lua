@@ -13,6 +13,10 @@ player.acceleration = 400
 player.drag = 399
 player.max_speed = 400
 player.health = 5
+player.isHurt = false
+player.hurtCooldown = 1
+player.hurtTimer = 1
+player.coins = 0
 
 function playerMovement(dt)
     vel_total = math.sqrt(math.pow(player.xvel,2) + math.pow(player.yvel,2))
@@ -27,7 +31,6 @@ function playerMovement(dt)
 
     --player.ANGACCEL = player.ANGACCEL * ANG_RESISTANCE
     --player.rotation = player.rotation + player.ROTATION_S * dt
-
 
 
     if love.keyboard.isDown("u") then
@@ -124,6 +127,15 @@ function playerMovement(dt)
     if love.keyboard.isDown(";") then
         fire_bullet_weapon()
     end
+
+    if player.hurt then
+        player.hurtTimer = player.hurtTimer - dt
+
+        if player.hurtTimer <= 0 then
+            player.hurtTimer = player.hurtCooldown
+            player.hurt = false
+        end
+    end
 end
 
 function drawPlayer()
@@ -165,7 +177,17 @@ function onPlayerDamage(x, y)
     player.xvel = player.xvel + xImp
     player.yvel = player.yvel + yImp
 
-    player.health = player.health - 1
+    if not player.hurt then
+        player.hurt = true
+
+        player.health = player.health - 1
+        if player.health <= 0 then
+            onPlayerDeath()
+            return true
+        end
+    end
+
+    return false
 end
 
 function onPlayerDeath()

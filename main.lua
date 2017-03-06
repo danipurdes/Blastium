@@ -37,6 +37,19 @@ logo_anim = {
     done = false
 }
 
+coins = {}
+
+coin = {
+    x = 100,
+    y = 100,
+    radius = 5,
+    removal_flag = false,
+    pickup_sound = love.audio.newSource("assets/audio/coin_pickup.wav","static"),
+    red = 200,
+    green = 200,
+    blue = 20
+}
+
 enemies = {}
 
 enemy = {
@@ -73,10 +86,21 @@ function loadGame()
     player.rotation = 3 * math.pi / 2
     player.xvel = 0
     player.yvel = 0
+    player.health = 5
+    player.coins = 0
     world.score = 0
 
     enemySpawnFormation(1)
     --enemySpawnFormation(2)
+
+    for i=1,12 do
+        local c = {}
+        c.x = coin.x + i*40
+        c.y = coin.y + i*20
+        c.radius = coin.radius
+        c.removal_flag = false
+        table.insert(coins, c)
+    end
 
     screenshake.active = false
     screenshake.current_magnitude = 0
@@ -140,7 +164,9 @@ function love.update(dt)
           end
 
           if circle_overlap(player.x, player.y, 16, v.x, v.y, 16) then
-            onPlayerDamage(v.x, v.y)
+            if onPlayerDamage(v.x, v.y) then
+                return
+            end
           end
 
           for j=#bullet_weapon.shots,1,-1 do
@@ -149,6 +175,15 @@ function love.update(dt)
               v.removal_flag = true
               s.removal_flag = true
               world.score = world.score + 1
+
+              --enemy drops a coin
+              local co = {}
+              co.x = v.x
+              co.y = v.y
+              co.radius = coin.radius
+              co.removal_flag = false
+              table.insert(coins, co)
+
               initiateScreenshake()
             end
           end
@@ -163,6 +198,15 @@ function love.update(dt)
             end
           end
       end
+
+      for i,c in ipairs(coins) do
+          if circle_overlap(player.x, player.y, 16, c.x, c.y, c.radius) then
+            player.coins = player.coins + 1
+            love.audio.play(coin.pickup_sound)
+            c.removal_flag = true
+          end
+      end
+
 
       for i=#enemies, 1, -1 do
         if enemies[i].removal_flag then
@@ -179,6 +223,12 @@ function love.update(dt)
       for i=#shell_weapon.shots, 1, -1 do
         if shell_weapon.shots[i].removal_flag then
             table.remove(shell_weapon.shots, i)
+        end
+      end
+
+      for i=#coins, 1, -1 do
+        if coins[i].removal_flag then
+            table.remove(coins, i)
         end
       end
 
@@ -276,6 +326,27 @@ function love.keypressed(key)
         player.active = not player.active
       end
 
+      if key == "x" then
+        if player.coins >= 3 then
+            player.health = player.health + 1
+            player.coins = player.coins - 3
+        end
+      end
+
+      if key == "n" then
+        if player.coins >= 5 then
+            shell_weapon.firing_rate_total = shell_weapon.firing_rate_total * .6
+            player.coins = player.coins - 5
+        end
+      end
+
+      if key == "m" then
+        if player.coins >= 5 then
+            bullet_weapon.firing_rate_total = bullet_weapon.firing_rate_total * .6
+            player.coins = player.coins - 5
+        end
+      end
+
   elseif world.state == "pause" then
     keypressedPauseMenu(key)
 
@@ -341,8 +412,12 @@ function love.draw()
         love.graphics.draw(v.image, v.x, v.y, v.rotation, 2, 2, v.image:getWidth()/2, v.image:getHeight()/2)
       end
 
-      love.graphics.setColor(255,0,0)
+      love.graphics.setColor(coin.red, coin.green, coin.blue)
+      for i,c in ipairs(coins) do
+        love.graphics.ellipse("fill", c.x, c.y, c.radius, c.radius)
+      end
 
+      love.graphics.setColor(255,255,255)
       drawShots()
       drawPlayer()
       drawHUD()

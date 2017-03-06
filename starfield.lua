@@ -8,13 +8,15 @@ function updateStarfield(dt)
     for i=1,#starfield.stars,1 do
         local v = starfield.stars[i]
         v.y = v.y + v.velocity*dt
+        v.x = v.x - .1*player.xvel*dt
+        v.y = v.y - .1*player.yvel*dt
         if v.y > 600 then
-            v = resetStar(v)
+            v = resetStar(v, v.x, v.y)
         end
     end
 end
 
-function resetStar(star)
+function resetStar(star, x, y)
     star.y = -5
     star.x = math.random(600)
     star.velocity = (math.random(10) + 1) * starfield.vel_multiplier

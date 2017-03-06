@@ -17,6 +17,8 @@ function drawHUD()
     love.graphics.setColor(255,255,255)
     love.graphics.setFont(fonts.text_font)
     love.graphics.printf("Score : " .. world.score, 10, 10, world.width - 20, "right")
+    love.graphics.printf("Health : " .. player.health, 10, 30, world.width - 20, "right")
+    love.graphics.printf("Coins : " .. player.coins, 10, 50, world.width - 20, "right")
 end
 
 function drawWeaponInfo(name, x, y, frc, frt, r0, g0, b0, r1, g1, b1)
