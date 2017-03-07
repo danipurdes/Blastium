@@ -3,6 +3,7 @@ controls_menu = {}
 function keypressedControlsMenu(key)
     if key == "space" then
         worldStateChange(world.previous_state)
+        menuIndexSelect()
     end
 end
 

@@ -7,6 +7,7 @@ player.yvel = 0
 player.rotation = 0
 player.ANGACCEL = 0
 player.image = love.graphics.newImage("assets/images/ship_bosco.png")
+player.damage_sound = love.audio.newSource("assets/audio/player_damage.wav","static")
 player.weapon_index = 0
 player.rotation_speed = 180
 player.acceleration = 400
@@ -159,10 +160,10 @@ function drawPlayer()
             love.graphics.draw(player.image, player.x + world.width, player.y + world.height, player.rotation, 1, 1, 16, 16)
         end
 
-        love.graphics.points(player.x + 60 * math.cos(player.rotation), player.y + 60 * math.sin(player.rotation))
-        local speedText = player.xvel .. ", " .. player.yvel
-        love.graphics.setColor(255,255,255)
-        love.graphics.printf(speedText, 20, 200, world.width)
+        --love.graphics.points(player.x + 60 * math.cos(player.rotation), player.y + 60 * math.sin(player.rotation))
+        --local speedText = player.xvel .. ", " .. player.yvel
+        --love.graphics.setColor(255,255,255)
+        --love.graphics.printf(speedText, 20, 200, world.width)
     end
 end
 
@@ -199,10 +200,6 @@ function onPlayerDeath()
     end
 
     worldStateChange("end")
-    despawnEnemies()
-    despawnBullets()
-    despawnShells()
-    despawnCoins()
 end
 
 return player

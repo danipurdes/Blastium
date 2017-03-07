@@ -1,7 +1,7 @@
 pause_menu = {}
 
 pause_menu.index = 0
-pause_menu.size = 4
+pause_menu.size = 3
 pause_menu.option_0 = "Resume"
 pause_menu.option_1 = "Controls"
 pause_menu.option_2 = "Options"
@@ -25,26 +25,26 @@ function keypressedPauseMenu(key)
 
     if key == "up" then
         pause_menu.index = (pause_menu.index - 1) % pause_menu.size
+        menuIndexChange()
     end
 
     if key == "down" then
         pause_menu.index = (pause_menu.index + 1) % pause_menu.size
+        menuIndexChange()
     end
 
     if key == "space" then
         if pause_menu.index == 0 then
-            world.state = "play"
-            world.previous_state = "pause"
+            worldStateChange("play")
         elseif pause_menu.index == 1 then
-            world.state = "controls"
-            world.previous_state = "pause"
+            worldStateChange("controls")
+        --elseif pause_menu.index == 2 then
+        --    worldStateChange("options")
         elseif pause_menu.index == 2 then
-            world.state = "options"
-            world.previous_state = "pause"
-        elseif pause_menu.index == 3 then
-            world.state = "start/main"
-            world.previous_state = "pause"
+            worldStateChange("start/main")
         end
+
+        menuIndexSelect()
     end
 end
 
@@ -65,8 +65,8 @@ function drawPauseMenu()
     love.graphics.printf(pause_text, 0, world.height / 2 - 40, world.width, "center")
     love.graphics.printf(pause_menu.option_0, 0, world.height / 2, world.width, "center")
     love.graphics.printf(pause_menu.option_1, 0, world.height / 2 + 20, world.width, "center")
-    love.graphics.printf(pause_menu.option_2, 0, world.height / 2 + 40, world.width, "center")
-    love.graphics.printf(pause_menu.option_3, 0, world.height / 2 + 60, world.width, "center")
+    --love.graphics.printf(pause_menu.option_2, 0, world.height / 2 + 40, world.width, "center")
+    love.graphics.printf(pause_menu.option_3, 0, world.height / 2 + 40, world.width, "center")
 
     love.graphics.draw(pause_menu.indicator_left, pause_menu.ind_left_x, pause_menu.ind_base_y + (pause_menu.ind_scale_y * pause_menu.index), 0)
     love.graphics.draw(pause_menu.indicator_right, pause_menu.ind_right_x, pause_menu.ind_base_y + (pause_menu.ind_scale_y * pause_menu.index), 0)

@@ -1,7 +1,7 @@
 screenshake = {}
 
 screenshake.active = false
-screenshake.magnitude = 5
+screenshake.magnitude = 2
 screenshake.current_magnitude = 0
 screenshake.lifespan = 1
 screenshake.period = 0.01

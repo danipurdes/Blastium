@@ -5,6 +5,7 @@ credits_menu.love_logo = love.graphics.newImage("assets/images/love-logo-0.10-sm
 function keypressedCreditsMenu(key)
     if key == "space" then
         worldStateChange(world.previous_state)
+        menuIndexSelect()
     end
 end
 

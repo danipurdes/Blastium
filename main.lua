@@ -55,6 +55,7 @@ enemies = {}
 
 enemy = {
     image = love.graphics.newImage("assets/images/enemy_ship.png"),
+    damage_sound = love.audio.newSource("assets/audio/enemy_damage.wav","static"),
     x = 0,
     y = 0,
     rotation = 0,
@@ -87,6 +88,11 @@ function love.load()
 end
 
 function loadGame()
+    despawnEnemies()
+    despawnBullets()
+    despawnShells()
+    despawnCoins()
+
     player.active = true
     player.x = world.width / 2
     player.y = world.height / 2
@@ -101,14 +107,14 @@ function loadGame()
     enemySpawnFormation(1)
     --enemySpawnFormation(2)
 
-    for i=1,12 do
-        local c = {}
-        c.x = coin.x + i*40
-        c.y = coin.y + i*20
-        c.radius = coin.radius
-        c.removal_flag = false
-        table.insert(coins, c)
-    end
+    --for i=1,12 do
+    --    local c = {}
+    --    c.x = coin.x + i*40
+    --    c.y = coin.y + i*20
+    --    c.radius = coin.radius
+    --    c.removal_flag = false
+    --    table.insert(coins, c)
+    --end
 
     screenshake.active = false
     screenshake.current_magnitude = 0
@@ -172,48 +178,55 @@ function love.update(dt)
           end
 
           if circle_overlap(player.x, player.y, 16, v.x, v.y, 16) then
+            initiateScreenshake()
+            love.audio.play(player.damage_sound)
             if onPlayerDamage(v.x, v.y) then
                 return
             end
           end
 
-          for j=#bullet_weapon.shots,1,-1 do
-            local s = bullet_weapon.shots[j]
-            if circle_overlap(s.x, s.y, 4, v.x, v.y, 16) then
-              v.removal_flag = true
-              s.removal_flag = true
-              world.score = world.score + 1
+          if not v.removal_flag then
+              for j=#bullet_weapon.shots,1,-1 do
+                local s = bullet_weapon.shots[j]
+                if circle_overlap(s.x, s.y, 4, v.x, v.y, 16) then
+                  v.removal_flag = true
+                  s.removal_flag = true
+                  world.score = world.score + 1
 
-              --enemy drops a coin
-              local co = {}
-              co.x = v.x
-              co.y = v.y
-              co.radius = coin.radius
-              co.removal_flag = false
-              table.insert(coins, co)
+                  --enemy drops a coin
+                  --local co = {}
+                  --co.x = v.x
+                  --co.y = v.y
+                  --co.radius = coin.radius
+                  --co.removal_flag = false
+                  --table.insert(coins, co)
 
-              initiateScreenshake()
-            end
-          end
+                  initiateScreenshake()
+                  love.audio.play(enemy.damage_sound)
+                end
+              end
 
-          for j=#shell_weapon.shots,1,-1 do
-            local s = shell_weapon.shots[j]
-            if circle_overlap(s.x, s.y, 4, v.x, v.y, 16) then
-              v.removal_flag = true
-              s.removal_flag = true
-              world.score = world.score + 1
-              initiateScreenshake()
-            end
-          end
-      end
+              for j=#shell_weapon.shots,1,-1 do
+                local s = shell_weapon.shots[j]
+                if circle_overlap(s.x, s.y, 4, v.x, v.y, 16) then
+                  v.removal_flag = true
+                  s.removal_flag = true
+                  world.score = world.score + 1
 
-      for i,c in ipairs(coins) do
-          if circle_overlap(player.x, player.y, 16, c.x, c.y, c.radius) then
-            player.coins = player.coins + 1
-            love.audio.play(coin.pickup_sound)
-            c.removal_flag = true
+                  initiateScreenshake()
+                  love.audio.play(enemy.damage_sound)
+                end
+              end
           end
       end
+
+      --for i,c in ipairs(coins) do
+        --if circle_overlap(player.x, player.y, 16, c.x, c.y, c.radius) then
+        --    player.coins = player.coins + 1
+        --    love.audio.play(coin.pickup_sound)
+        --    c.removal_flag = true
+        --end
+      --end
 
       for i=#enemies, 1, -1 do
         if enemies[i].removal_flag then
@@ -233,11 +246,11 @@ function love.update(dt)
         end
       end
 
-      for i=#coins, 1, -1 do
-        if coins[i].removal_flag then
-            table.remove(coins, i)
-        end
-      end
+      --for i=#coins, 1, -1 do
+        --if coins[i].removal_flag then
+            --table.remove(coins, i)
+        --end
+      --end
 
       updateStarfield(dt)
 
@@ -245,6 +258,9 @@ function love.update(dt)
     updatePauseMenu(dt)
 
   elseif world.state == "controls" then
+    updateStarfield(dt)
+
+  elseif world.state == "options" then
     updateStarfield(dt)
 
   elseif world.state == "credits" then
@@ -306,47 +322,39 @@ function love.keypressed(key)
         fire_shell_weapon()
       end
 
-      if key == "j" then
-        world.score = world.score + 1
-      end
-
       if key == "p" then
         worldStateChange("pause")
       end
 
-      if key == "v" then
-        for i = 1,#enemies,1 do
-            local v = enemies[i]
-            v.rotation_influence = v.rotation_influence * -1
-        end
-      end
+      --if key == "v" then
+        --for i = 1,#enemies,1 do
+        --    local v = enemies[i]
+        --    v.rotation_influence = v.rotation_influence * -1
+        --end
+      --end
 
-      if key == "c" then
-        player.active = not player.active
-      end
+      --if circle_overlap(player.x, player.y, 16, shop.x, shop.y, shop.radius) then
+          --if key == "x" then
+            --if player.coins >= 3 then
+            --    player.health = player.health + 1
+            --    player.coins = player.coins - 3
+            --end
+          --end
 
-      if circle_overlap(player.x, player.y, 16, shop.x, shop.y, shop.radius) then
-          if key == "x" then
-            if player.coins >= 3 then
-                player.health = player.health + 1
-                player.coins = player.coins - 3
-            end
-          end
+          --if key == "n" then
+            --if player.coins >= 5 then
+            --    shell_weapon.firing_rate_total = shell_weapon.firing_rate_total * .6
+            --    player.coins = player.coins - 5
+            --end
+          --end
 
-          if key == "n" then
-            if player.coins >= 5 then
-                shell_weapon.firing_rate_total = shell_weapon.firing_rate_total * .6
-                player.coins = player.coins - 5
-            end
-          end
-
-          if key == "m" then
-            if player.coins >= 5 then
-                bullet_weapon.firing_rate_total = bullet_weapon.firing_rate_total * .6
-                player.coins = player.coins - 5
-            end
-          end
-      end
+          --if key == "m" then
+            --if player.coins >= 5 then
+            --    bullet_weapon.firing_rate_total = bullet_weapon.firing_rate_total * .6
+            --    player.coins = player.coins - 5
+            --end
+          --end
+      --end
 
   elseif world.state == "pause" then
     keypressedPauseMenu(key)
@@ -453,19 +461,19 @@ function love.draw()
         love.graphics.draw(v.image, v.x, v.y, v.rotation, 2, 2, v.image:getWidth()/2, v.image:getHeight()/2)
       end
 
-      love.graphics.setColor(coin.red, coin.green, coin.blue)
-      for i,c in ipairs(coins) do
-        love.graphics.ellipse("fill", c.x, c.y, c.radius, c.radius)
-      end
+      --love.graphics.setColor(coin.red, coin.green, coin.blue)
+      --for i,c in ipairs(coins) do
+        --love.graphics.ellipse("fill", c.x, c.y, c.radius, c.radius)
+      --end
 
-      love.graphics.setColor(200,200,200)
-      love.graphics.ellipse("fill", shop.x, shop.y, shop.radius, shop.radius)
+      --love.graphics.setColor(200,200,200)
+      --love.graphics.ellipse("fill", shop.x, shop.y, shop.radius, shop.radius)
 
       love.graphics.setColor(255,255,255)
       drawShots()
       drawPlayer()
       drawHUD()
-      love.graphics.printf("fps " .. love.timer.getFPS(), 20, world.height - 40, world.width);
+      --love.graphics.printf("fps " .. love.timer.getFPS(), 20, world.height - 40, world.width);
       love.graphics.pop()
 
   elseif world.state == "pause" then
@@ -496,6 +504,7 @@ function love.draw()
         end_text = "- NEW HIGH SCORE -"
       else
         end_text = "- GAME OVER -"
+      end
 
       local score_text = "SCORE : " .. world.score
       local high_score_text = "HIGH SCORE : " .. world.high_score
