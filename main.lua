@@ -19,6 +19,7 @@ shell_round = require "shell_round"
 main_menu = require "main_menu"
 controls_menu = require "controls_menu"
 pause_menu = require "pause_menu"
+options_menu = require "options_menu"
 credits_menu = require "credits_menu"
 
 title_anim = {
@@ -64,6 +65,12 @@ enemy = {
     removal_flag = false
 }
 
+shop = {
+    x = 200,
+    y = 200,
+    radius = 10
+}
+
 function love.load()
     audio.music:setLooping(true)
     audio.music:setVolume(.25)
@@ -89,6 +96,7 @@ function loadGame()
     player.health = 5
     player.coins = 0
     world.score = 0
+    world.high_score_flag = false
 
     enemySpawnFormation(1)
     --enemySpawnFormation(2)
@@ -207,7 +215,6 @@ function love.update(dt)
           end
       end
 
-
       for i=#enemies, 1, -1 do
         if enemies[i].removal_flag then
             table.remove(enemies, i)
@@ -303,16 +310,8 @@ function love.keypressed(key)
         world.score = world.score + 1
       end
 
-      if key == "l" then
-        worldStateChange("end")
-      end
-
       if key == "p" then
         worldStateChange("pause")
-      end
-
-      if key == "b" then
-        screenshake.active = true
       end
 
       if key == "v" then
@@ -326,25 +325,27 @@ function love.keypressed(key)
         player.active = not player.active
       end
 
-      if key == "x" then
-        if player.coins >= 3 then
-            player.health = player.health + 1
-            player.coins = player.coins - 3
-        end
-      end
+      if circle_overlap(player.x, player.y, 16, shop.x, shop.y, shop.radius) then
+          if key == "x" then
+            if player.coins >= 3 then
+                player.health = player.health + 1
+                player.coins = player.coins - 3
+            end
+          end
 
-      if key == "n" then
-        if player.coins >= 5 then
-            shell_weapon.firing_rate_total = shell_weapon.firing_rate_total * .6
-            player.coins = player.coins - 5
-        end
-      end
+          if key == "n" then
+            if player.coins >= 5 then
+                shell_weapon.firing_rate_total = shell_weapon.firing_rate_total * .6
+                player.coins = player.coins - 5
+            end
+          end
 
-      if key == "m" then
-        if player.coins >= 5 then
-            bullet_weapon.firing_rate_total = bullet_weapon.firing_rate_total * .6
-            player.coins = player.coins - 5
-        end
+          if key == "m" then
+            if player.coins >= 5 then
+                bullet_weapon.firing_rate_total = bullet_weapon.firing_rate_total * .6
+                player.coins = player.coins - 5
+            end
+          end
       end
 
   elseif world.state == "pause" then
@@ -356,6 +357,42 @@ function love.keypressed(key)
   elseif world.state == "options" then
       if key == "space" then
         worldStateChange(world.previous_state)
+      end
+
+      if key == "down" then
+        options_menu.index = (options_menu.index + 1) % options_menu.count
+      end
+
+      if key == "up" then
+        options_menu.index = (options_menu.index + 1) % options_menu.count
+      end
+
+      if key == "right" then
+        if options_menu.index == 1 then
+          options_menu.option_1_value = options_menu.option_1_value + .1
+          if options_menu.option_1_value > 1 then
+            options_menu.option_1_value = 1
+          end
+        else
+          options_menu.option_2_value = options_menu.option_2_value + .1
+          if options_menu.option_2_value > 1 then
+            options_menu.option_2_value = 1
+          end
+        end
+      end
+
+      if key == "left" then
+        if options_menu.index == 1 then
+          options_menu.option_1_value = options_menu.option_1_value - .1
+          if options_menu.option_1_value < 0 then
+            options_menu.option_1_value = 0
+          end
+        else
+          options_menu.option_2_value = options_menu.option_2_value - .1
+          if options_menu.option_2_value < 0 then
+            options_menu.option_2_value = 0
+          end
+        end
       end
 
   elseif world.state == "credits" then
@@ -378,6 +415,10 @@ end
 
 function despawnShells()
     shell_weapon.shots = {}
+end
+
+function despawnCoins()
+    coins = {}
 end
 
 function love.draw()
@@ -417,6 +458,9 @@ function love.draw()
         love.graphics.ellipse("fill", c.x, c.y, c.radius, c.radius)
       end
 
+      love.graphics.setColor(200,200,200)
+      love.graphics.ellipse("fill", shop.x, shop.y, shop.radius, shop.radius)
+
       love.graphics.setColor(255,255,255)
       drawShots()
       drawPlayer()
@@ -430,17 +474,35 @@ function love.draw()
   elseif world.state == "controls" then
       drawControlsMenu()
 
+  elseif world.state == "options" then
+      drawStarfield()
+      love.graphics.setFont(fonts.text_font)
+      love.graphics.setColor(255,255,255)
+      love.graphics.printf(options_menu.option_1_title, 40, world.height / 2 - 50, world.width - 40, "left")
+      love.graphics.rectangle("fill", 40, world.height / 2 - 20, 104, 4)
+      love.graphics.rectangle("fill", 40 + options_menu.option_1_value * 100, world.height / 2 - 28, 4, 16)
+      love.graphics.printf(options_menu.option_2_title, 40, world.height / 2 + 10, world.width - 40, "left")
+      love.graphics.rectangle("fill", 40, world.height / 2 + 40, 104, 4)
+      love.graphics.rectangle("fill", 40 + options_menu.option_2_value * 100, world.height / 2 + 32, 4, 16)
+
   elseif world.state == "credits" then
       drawCreditsMenu()
 
   elseif world.state == "end" then
       drawStarfield()
 
-      local end_text = "- GAME OVER -"
+      local end_text = ""
+      if world.high_score_flag then
+        end_text = "- NEW HIGH SCORE -"
+      else
+        end_text = "- GAME OVER -"
+
       local score_text = "SCORE : " .. world.score
+      local high_score_text = "HIGH SCORE : " .. world.high_score
       love.graphics.setFont(fonts.text_font)
-      love.graphics.printf(end_text, 0, world.height / 2 - 10, world.width, "center")
-      love.graphics.printf(score_text, 0, world.height / 2 + 10, world.width, "center")
+      love.graphics.printf(end_text, 0, world.height / 2 - 20, world.width, "center")
+      love.graphics.printf(score_text, 0, world.height / 2 , world.width, "center")
+      love.graphics.printf(high_score_text, 0, world.height / 2 + 20, world.width, "center");
   end
 end
 

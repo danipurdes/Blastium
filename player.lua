@@ -192,10 +192,17 @@ end
 
 function onPlayerDeath()
     player.active = false
+
+    if world.high_score < world.score then
+        world.high_score = world.score
+        world.high_score_flag = true
+    end
+
     worldStateChange("end")
     despawnEnemies()
     despawnBullets()
     despawnShells()
+    despawnCoins()
 end
 
 return player
