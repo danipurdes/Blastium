@@ -3,7 +3,7 @@ credits_menu = {}
 credits_menu.love_logo = love.graphics.newImage("assets/images/love-logo-0.10-small-white.png")
 
 function keypressedCreditsMenu(key)
-    if key == "space" then
+    if key == "escape" then
         worldStateChange(world.previous_state)
         menuIndexSelect()
     end
@@ -20,21 +20,24 @@ function drawCreditsMenu()
 
     love.graphics.setColor(255,255,255)
 
-    love.graphics.setFont(fonts.title_font)
+    love.graphics.setFont(fonts.font_title)
     love.graphics.printf(world.name, 0, 85, world.width, "center")
 
-    love.graphics.setFont(fonts.text_font)
+    love.graphics.setFont(fonts.font_text)
 
-    love.graphics.printf("- Developer -", 0, 190, world.width, "center")
-    love.graphics.printf("Daniel Purdes", 0, 210, world.width, "center")
+    love.graphics.printf("- DEVELOPER -", 0, 190, world.width, "center")
+    love.graphics.printf("DANNY PURDES", 0, 210, world.width, "center")
 
-    love.graphics.printf("- Technical Consultant -", 0, 250, world.width, "center")
-    love.graphics.printf("Scott Munro", 0, 270, world.width, "center")
+    love.graphics.printf("- TECHNICAL CONSULTANT -", 0, 250, world.width, "center")
+    love.graphics.printf("SCOTT MUNRO", 0, 270, world.width, "center")
 
-    love.graphics.printf("- Fonts -", 0, 310, world.width, "center")
-    love.graphics.printf("Chris Early", 0, 330, world.width, "center")
-    love.graphics.printf("Made with", 0, 420, world.width, "center")
+    love.graphics.printf("- FONTS -", 0, 310, world.width, "center")
+    love.graphics.printf("CHRIS EARLY", 0, 330, world.width, "center")
+    
+    love.graphics.printf("MADE WITH", 0, 420, world.width, "center")
     love.graphics.draw(credits_menu.love_logo, world.width/2 - credits_menu.love_logo:getWidth()/2, 440)
+
+    love.graphics.printf("PRESS ESCAPE TO RETURN", 0, world.height - 30, world.width, "center")
 end
 
 return credits_menu

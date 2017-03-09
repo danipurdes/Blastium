@@ -2,15 +2,15 @@ pause_menu = {}
 
 pause_menu.index = 0
 pause_menu.size = 3
-pause_menu.option_0 = "Resume"
-pause_menu.option_1 = "Controls"
-pause_menu.option_2 = "Options"
-pause_menu.option_3 = "Quit to Menu"
+pause_menu.option_0 = "RESUME"
+pause_menu.option_1 = "CONTROLS"
+pause_menu.option_2 = "OPTIONS"
+pause_menu.option_3 = "QUIT TO MENU"
 pause_menu.indicator_left = love.graphics.newImage("assets/images/pause_indicator_left_new.png")
 pause_menu.ind_left_x = 204
 pause_menu.indicator_right = love.graphics.newImage("assets/images/pause_indicator_right_new.png")
 pause_menu.ind_right_x = 381
-pause_menu.ind_base_y = 300
+pause_menu.ind_base_y = 295
 pause_menu.ind_scale_y = 20
 
 function updatePauseMenu(dt)
@@ -19,8 +19,8 @@ end
 
 function keypressedPauseMenu(key)
     if key == "p" then
-        world.state = "play"
-        world.previous_state = "pause"
+        worldStateChange("play")
+        menuIndexSelect()
     end
 
     if key == "up" then
@@ -58,11 +58,13 @@ function drawPauseMenu()
     love.graphics.rectangle("fill", 0, 0, world.width, world.height)
 
     love.graphics.setColor(0,0,0,255)
-    love.graphics.rectangle("fill", 50, 50, 500, 500)
+    love.graphics.rectangle("fill", 150, 150, 300, 300)
 
-    love.graphics.setColor(255, 255, 255);
+    love.graphics.setColor(255, 255, 255)
+    love.graphics.setFont(fonts.font_title)
     local pause_text = "- PAUSED -"
     love.graphics.printf(pause_text, 0, world.height / 2 - 40, world.width, "center")
+    love.graphics.setFont(fonts.font_text)
     love.graphics.printf(pause_menu.option_0, 0, world.height / 2, world.width, "center")
     love.graphics.printf(pause_menu.option_1, 0, world.height / 2 + 20, world.width, "center")
     --love.graphics.printf(pause_menu.option_2, 0, world.height / 2 + 40, world.width, "center")

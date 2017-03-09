@@ -2,16 +2,16 @@ main_menu = {}
 
 main_menu.index = 0
 main_menu.size = 4
-main_menu.option_0 = "Play"
-main_menu.option_1 = "Controls"
-main_menu.option_2 = "Options"
-main_menu.option_3 = "Credits"
-main_menu.option_4 = "Quit Game"
+main_menu.option_0 = "PLAY"
+main_menu.option_1 = "CONTROLS"
+main_menu.option_2 = "OPTIONS"
+main_menu.option_3 = "CREDITS"
+main_menu.option_4 = "QUIT GAME"
 main_menu.indicator_left = love.graphics.newImage("assets/images/pause_indicator_left_new.png")
-main_menu.ind_left_x = 204
+main_menu.ind_left_x = 220
 main_menu.indicator_right = love.graphics.newImage("assets/images/pause_indicator_right_new.png")
-main_menu.ind_right_x = 381
-main_menu.ind_base_y = 300
+main_menu.ind_right_x = 365
+main_menu.ind_base_y = 295
 main_menu.ind_scale_y = 20
 
 function keypressedMainMenu(key)
@@ -49,7 +49,7 @@ function drawMainMenu()
     love.graphics.setColor(255, 255, 255)
     love.graphics.setFont(fonts.title_font)
     love.graphics.printf(world.name, 0, lerp(logo_anim.start_y, logo_anim.t, logo_anim.end_y, logo_anim.lifespan), world.width, "center")
-    love.graphics.setFont(fonts.text_font)
+    love.graphics.setFont(fonts.font_text)
 
     love.graphics.setColor(255, 255, 255);
     love.graphics.printf(main_menu.option_0, 0, world.height / 2, world.width, "center")
@@ -60,6 +60,8 @@ function drawMainMenu()
 
     love.graphics.draw(main_menu.indicator_left, main_menu.ind_left_x, main_menu.ind_base_y + (main_menu.ind_scale_y * main_menu.index), 0)
     love.graphics.draw(main_menu.indicator_right, main_menu.ind_right_x, main_menu.ind_base_y + (main_menu.ind_scale_y * main_menu.index), 0)
-end
+
+    love.graphics.printf("USE ARROW KEYS AND SPACE TO NAVIGATE MENUS", 0, world.height - 30, world.width, "center")
+    end
 
 return main_menu

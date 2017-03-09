@@ -8,12 +8,14 @@ player.rotation = 0
 player.ANGACCEL = 0
 player.image = love.graphics.newImage("assets/images/ship_bosco.png")
 player.damage_sound = love.audio.newSource("assets/audio/player_damage.wav","static")
+player.death_sound = love.audio.newSource("assets/audio/player_death.wav","static")
 player.weapon_index = 0
 player.rotation_speed = 180
 player.acceleration = 400
 player.drag = 399
 player.max_speed = 400
 player.health = 5
+player.health_max = 5
 player.isHurt = false
 player.hurtCooldown = 1
 player.hurtTimer = 1
@@ -125,7 +127,7 @@ function playerMovement(dt)
     bullet_weapon.firing_rate_current = math.max(0, bullet_weapon.firing_rate_current - dt)
     shell_weapon.firing_rate_current = math.max(0, shell_weapon.firing_rate_current - dt)
 
-    if love.keyboard.isDown(";") then
+    if love.keyboard.isDown("k") then
         fire_bullet_weapon()
     end
 
@@ -141,7 +143,12 @@ end
 
 function drawPlayer()
     if player.active then
-        love.graphics.setColor(255,255,255)
+        if not player.hurt then
+            love.graphics.setColor(255,255,255)
+        else
+            love.graphics.setColor(200 + 55 * (1 - player.hurtTimer), 50 + 100 * (1 - player.hurtTimer), 50 + 100 * (1 - player.hurtTimer))
+        end
+
         love.graphics.draw(player.image, player.x, player.y, player.rotation, 1, 1, player.image:getWidth()/2, player.image:getHeight()/2)
         local px = player.x
         local py = player.y
@@ -200,6 +207,7 @@ function onPlayerDeath()
     end
 
     worldStateChange("end")
+    love.audio.play(player.death_sound)
 end
 
 return player

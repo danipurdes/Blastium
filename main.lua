@@ -1,3 +1,5 @@
+love.graphics.setDefaultFilter("nearest", "nearest")
+
 utilities = require "utilities"
 
 world = require "world"
@@ -31,7 +33,7 @@ title_anim = {
 }
 
 logo_anim = {
-    lifespan = 4,
+    lifespan = 3,
     start_y = -50,
     end_y = (600 / 2) - 64,
     t = 0,
@@ -66,6 +68,30 @@ enemy = {
     removal_flag = false
 }
 
+asteroids = {}
+
+asteroid_16 = {
+    image = love.graphics.newImage("assets/images/asteroid_16.png"),
+    x = 0,
+    y = 0,
+    rotation = 0,
+    speed = 10,
+    radius = 16,
+    removal_flag = false,
+    type = 16
+}
+
+asteroid_8 = {
+    image = love.graphics.newImage("assets/images/asteroid_8.png"),
+    x = 0,
+    y = 0,
+    rotation = 0,
+    speed = 10,
+    radius = 8,
+    removal_flag = false,
+    type = 8
+}
+
 shop = {
     x = 200,
     y = 200,
@@ -73,6 +99,7 @@ shop = {
 }
 
 function love.load()
+    love.graphics.setDefaultFilter("nearest", "nearest")
     audio.music:setLooping(true)
     audio.music:setVolume(.25)
     love.audio.setVolume(audio.volume_max)
@@ -101,11 +128,43 @@ function loadGame()
     player.yvel = 0
     player.health = 5
     player.coins = 0
+    player.hurt = false
+    player.hurtTimer = 1
+    player.hurtCooldown = 1
     world.score = 0
     world.high_score_flag = false
 
     enemySpawnFormation(1)
     --enemySpawnFormation(2)
+
+    for i=1,4 do
+        local ast = {}
+        ast.image = asteroid_16.image
+        ast.x = 50 + i * 50
+        ast.y = 100
+        ast.rotation = i * math.pi * 2
+        ast.speed = 10
+        ast.radius = 16
+        ast.spin = math.pi/8
+        ast.spin_speed = math.pi/8
+        ast.removal_flag = false
+        ast.type = 16
+        table.insert(asteroids, ast)
+    end
+
+    --for i=1,4 do
+    --    local ast = {}
+    --    ast.image = asteroid_8.image
+    --    ast.x = 50 + i * 50
+    --    ast.y = 300
+    --    ast.rotation = i * math.pi * 2
+    --    ast.speed = 10
+    --    ast.radius = 8
+    --    ast.spin = math.pi/8
+    --    ast.spin_speed = math.pi/4
+    --    ast.removal_flag = false
+    --    table.insert(asteroids, ast)
+    --end
 
     --for i=1,12 do
     --    local c = {}
@@ -220,6 +279,43 @@ function love.update(dt)
           end
       end
 
+      for i,a in ipairs(asteroids) do
+        a.x = a.x + dt * a.speed * math.cos(a.rotation)
+        a.y = a.y + dt * a.speed * math.sin(a.rotation)
+        a.spin = a.spin + dt * a.spin_speed
+        a.spin = a.spin % (2 * math.pi)
+
+        if not a.removal_flag then
+            for j=#bullet_weapon.shots,1,-1 do
+              local s = bullet_weapon.shots[j]
+              if circle_overlap(s.x, s.y, 4, a.x, a.y, a.radius) then
+                a.removal_flag = true
+                s.removal_flag = true
+                world.score = world.score + 1
+                if a.type == 16 then
+                    spawnAsteroids8(a.x, a.y)
+                end
+                initiateScreenshake()
+                love.audio.play(enemy.damage_sound)
+              end
+            end
+
+            for j=#shell_weapon.shots,1,-1 do
+              local s = shell_weapon.shots[j]
+              if circle_overlap(s.x, s.y, 4, a.x, a.y, a.radius) then
+                a.removal_flag = true
+                s.removal_flag = true
+                world.score = world.score + 1
+                if a.type == 16 then
+                    spawnAsteroids8(a.x, a.y)
+                end
+                initiateScreenshake()
+                love.audio.play(enemy.damage_sound)
+              end
+            end
+        end
+      end
+
       --for i,c in ipairs(coins) do
         --if circle_overlap(player.x, player.y, 16, c.x, c.y, c.radius) then
         --    player.coins = player.coins + 1
@@ -243,6 +339,12 @@ function love.update(dt)
       for i=#shell_weapon.shots, 1, -1 do
         if shell_weapon.shots[i].removal_flag then
             table.remove(shell_weapon.shots, i)
+        end
+      end
+
+      for i=#asteroids, 1, -1 do
+        if asteroids[i].removal_flag then
+            table.remove(asteroids, i)
         end
       end
 
@@ -284,22 +386,24 @@ function love.keypressed(key)
         else
             worldStateChange("start/main")
         end
+
+        menuIndexSelect()
       end
 
-      if starfield.state == "initial" then
-          if key == "p" then
-            for i=1,#starfield.stars,1 do
-                starfield.stars[i].velocity = starfield.stars[i].velocity * 200
-                starfield.state = "transition"
-                starfield.vel_multiplier = 200
-            end
-          end
-      elseif starfield.state == "transition" then
-          if key == "p" then
-            worldStateChange("play")
-            world.score = 0
-          end
-      end
+      --if starfield.state == "initial" then
+          --if key == "p" then
+            --for i=1,#starfield.stars,1 do
+            --    starfield.stars[i].velocity = starfield.stars[i].velocity * 200
+            --    starfield.state = "transition"
+            --    starfield.vel_multiplier = 200
+            --end
+          --end
+      --elseif starfield.state == "transition" then
+          --if key == "p" then
+            --worldStateChange("play")
+            --world.score = 0
+          --end
+      --end
 
   elseif world.state == "start/main" then
       keypressedMainMenu(key)
@@ -318,12 +422,13 @@ function love.keypressed(key)
         end
       end
 
-      if key == "\'" then
+      if key == "l" then
         fire_shell_weapon()
       end
 
       if key == "p" then
         worldStateChange("pause")
+        menuIndexSelect()
       end
 
       --if key == "v" then
@@ -363,7 +468,7 @@ function love.keypressed(key)
     keypressedControlsMenu(key)
 
   elseif world.state == "options" then
-      if key == "space" then
+      if key == "escape" then
         worldStateChange(world.previous_state)
       end
 
@@ -425,8 +530,29 @@ function despawnShells()
     shell_weapon.shots = {}
 end
 
+function despawnAsteroids()
+    asteroids = {}
+end
+
 function despawnCoins()
     coins = {}
+end
+
+function spawnAsteroids8(x, y)
+    for i=1,2 do
+        local ast = {}
+        ast.image = asteroid_8.image
+        ast.x = x
+        ast.y = y
+        ast.rotation = i * math.pi
+        ast.speed = 10
+        ast.radius = 8
+        ast.spin = math.pi/8
+        ast.spin_speed = math.pi/8
+        ast.removal_flag = false
+        ast.type = 8
+        table.insert(asteroids, ast)
+    end
 end
 
 function love.draw()
@@ -439,7 +565,7 @@ function love.draw()
       love.graphics.setColor(255, 255, 255)
       love.graphics.setFont(fonts.title_font)
       love.graphics.printf(world.name, 0, lerp(logo_anim.start_y, logo_anim.t, logo_anim.end_y, logo_anim.lifespan), world.width, "center")
-      love.graphics.setFont(fonts.text_font)
+      love.graphics.setFont(fonts.font_text)
 
       if logo_anim.done then
           local start_text = "- PRESS SPACE TO PLAY -"
@@ -459,6 +585,10 @@ function love.draw()
       for i=1,#enemies,1 do
         local v = enemies[i]
         love.graphics.draw(v.image, v.x, v.y, v.rotation, 2, 2, v.image:getWidth()/2, v.image:getHeight()/2)
+      end
+
+      for i,a in ipairs(asteroids) do
+        love.graphics.draw(a.image, a.x, a.y, a.spin, 2, 2, a.image:getWidth()/2, a.image:getHeight()/2)
       end
 
       --love.graphics.setColor(coin.red, coin.green, coin.blue)
