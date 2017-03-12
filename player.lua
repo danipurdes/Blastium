@@ -61,30 +61,30 @@ function playerMovement(dt)
         player.yvel = player.yvel + dt * math.sin(tangentVectorAngle) * linearVel
     end
 
-    if love.keyboard.isDown("i") then
+    --if love.keyboard.isDown("i") then
         -- orbit
 
         -- find the center of the orbit point
-        local distanceToOrbitCenter = 300 --60
-        local orbitCenterX = player.x + math.cos(player.rotation) * distanceToOrbitCenter
-        local orbitCenterY = player.y + math.sin(player.rotation) * distanceToOrbitCenter
+        --local distanceToOrbitCenter = 300 --60
+        --local orbitCenterX = player.x + math.cos(player.rotation) * distanceToOrbitCenter
+        --local orbitCenterY = player.y + math.sin(player.rotation) * distanceToOrbitCenter
 
         -- find the destination rotation
-        local rotVel = math.pi
-        local orbitRot = math.pi + player.rotation
-        orbitRot = orbitRot - rotVel * dt
-        player.rotation = math.pi + orbitRot
+        --local rotVel = math.pi
+        --local orbitRot = math.pi + player.rotation
+        --orbitRot = orbitRot - rotVel * dt
+        --player.rotation = math.pi + orbitRot
 
-        -- set the ship to be at the destination rotation
-        --player.x = math.cos(orbitRot) * distanceToOrbitCenter + orbitCenterX
-        --player.y = math.sin(orbitRot) * distanceToOrbitCenter + orbitCenterY
+        ---- set the ship to be at the destination rotation
+        ----player.x = math.cos(orbitRot) * distanceToOrbitCenter + orbitCenterX
+        ----player.y = math.sin(orbitRot) * distanceToOrbitCenter + orbitCenterY
 
         -- flub the velocity
-        local tangentVectorAngle = (player.rotation + (math.pi + math.pi / 2))
-        local linearVel = rotVel * (distanceToOrbitCenter)
-        player.xvel = player.xvel - dt * math.cos(tangentVectorAngle) * linearVel
-        player.yvel = player.yvel - dt * math.sin(tangentVectorAngle) * linearVel
-    end
+        --local tangentVectorAngle = (player.rotation + (math.pi + math.pi / 2))
+        --local linearVel = rotVel * (distanceToOrbitCenter)
+        --player.xvel = player.xvel - dt * math.cos(tangentVectorAngle) * linearVel
+        --player.yvel = player.yvel - dt * math.sin(tangentVectorAngle) * linearVel
+    --end
 
         -- forward backward
         if love.keyboard.isDown("s") then

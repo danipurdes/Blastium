@@ -47,8 +47,9 @@ function drawMainMenu()
     drawStarfield()
 
     love.graphics.setColor(255, 255, 255)
-    love.graphics.setFont(fonts.title_font)
-    love.graphics.printf(world.name, 0, lerp(logo_anim.start_y, logo_anim.t, logo_anim.end_y, logo_anim.lifespan), world.width, "center")
+    --love.graphics.setFont(fonts.title_font)
+    --love.graphics.printf(world.name, 0, lerp(logo_anim.start_y, logo_anim.t, logo_anim.end_y, logo_anim.lifespan), world.width, "center")
+    love.graphics.draw(world.logo, 300, lerp(logo_anim.start_y, logo_anim.t, logo_anim.end_y, logo_anim.lifespan), 0, 4, 4, world.logo:getWidth()/2, world.logo:getHeight()/2)
     love.graphics.setFont(fonts.font_text)
 
     love.graphics.setColor(255, 255, 255);

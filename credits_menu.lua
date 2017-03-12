@@ -20,8 +20,9 @@ function drawCreditsMenu()
 
     love.graphics.setColor(255,255,255)
 
-    love.graphics.setFont(fonts.font_title)
-    love.graphics.printf(world.name, 0, 85, world.width, "center")
+    --love.graphics.setFont(fonts.font_title)
+    --love.graphics.printf(world.name, 0, 85, world.width, "center")
+    love.graphics.draw(world.logo, 300, 124, 0, 4, 4, world.logo:getWidth()/2, world.logo:getHeight()/2)
 
     love.graphics.setFont(fonts.font_text)
 
@@ -33,9 +34,10 @@ function drawCreditsMenu()
 
     love.graphics.printf("- FONTS -", 0, 310, world.width, "center")
     love.graphics.printf("CHRIS EARLY", 0, 330, world.width, "center")
-    
+
     love.graphics.printf("MADE WITH", 0, 420, world.width, "center")
     love.graphics.draw(credits_menu.love_logo, world.width/2 - credits_menu.love_logo:getWidth()/2, 440)
+    love.graphics.printf("LOVE2D.ORG", 0, 500, world.width, "center")
 
     love.graphics.printf("PRESS ESCAPE TO RETURN", 0, world.height - 30, world.width, "center")
 end

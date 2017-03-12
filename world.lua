@@ -7,6 +7,7 @@ world.previous_state = "start/open"
 world.score = 0
 world.high_score = 0
 world.high_score_flag = false
+world.logo = love.graphics.newImage("assets/images/blastium_logo.png")
 
 world.menu_index_change_sound = love.audio.newSource("assets/audio/menu_index_change.wav","static")
 world.menu_index_select_sound = love.audio.newSource("assets/audio/menu_index_select.wav","static")
@@ -14,6 +15,14 @@ world.menu_index_select_sound = love.audio.newSource("assets/audio/menu_index_se
 function worldStateChange(new_state)
     world.previous_state = world.state
     world.state = new_state
+
+    if new_state == "start/main" then
+        toMainMenu()
+    end
+
+    if new_state == "pause" then
+        toPauseMenu()
+    end
 end
 
 function menuIndexChange()

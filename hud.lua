@@ -24,7 +24,7 @@ function drawHUD()
         love.graphics.draw(player.image, 588 - 11 - i * 20, 34, 3*math.pi/2, .5, .5, player.image:getWidth()/2, player.image:getHeight()/2)
     end
 
-    love.graphics.setColor(50,50,50)
+    love.graphics.setColor(75,75,75)
     for i=player.health,player.health_max-1 do
         love.graphics.draw(player.image, 588 - 11 - i * 20, 34, 3*math.pi/2, .5, .5, player.image:getWidth()/2, player.image:getHeight()/2)
     end

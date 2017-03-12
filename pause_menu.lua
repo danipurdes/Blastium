@@ -72,6 +72,8 @@ function drawPauseMenu()
 
     love.graphics.draw(pause_menu.indicator_left, pause_menu.ind_left_x, pause_menu.ind_base_y + (pause_menu.ind_scale_y * pause_menu.index), 0)
     love.graphics.draw(pause_menu.indicator_right, pause_menu.ind_right_x, pause_menu.ind_base_y + (pause_menu.ind_scale_y * pause_menu.index), 0)
+
+    love.graphics.printf("USE ARROW KEYS AND SPACE TO NAVIGATE MENUS", 0, world.height - 30, world.width, "center")
 end
 
 return pause_menu
