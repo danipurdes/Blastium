@@ -21,6 +21,22 @@ player.hurtCooldown = 1
 player.hurtTimer = 1
 player.coins = 0
 
+function loadPlayer()
+    player.active = true
+    player.x = world.width / 2
+    player.y = world.height / 2
+    player.rotation = 3 * math.pi / 2
+    player.xvel = 0
+    player.yvel = 0
+    player.health = 5
+    player.coins = 0
+    player.hurt = false
+    player.hurtTimer = 1
+    player.hurtCooldown = 1
+    world.score = 0
+    world.high_score_flag = false
+end
+
 function playerMovement(dt)
     vel_total = math.sqrt(math.pow(player.xvel,2) + math.pow(player.yvel,2))
 

@@ -14,7 +14,7 @@ pause_menu.ind_base_y = 295
 pause_menu.ind_scale_y = 20
 
 function updatePauseMenu(dt)
-    updateStarfield(dt)
+    --updateStarfield(dt)
 end
 
 function keypressedPauseMenu(key)
