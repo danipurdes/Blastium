@@ -1,6 +1,6 @@
 starfield = {}
 starfield.state = "initial"
-starfield.count = 128
+starfield.count = 64
 starfield.stars = {}
 starfield.vel_multiplier = 1
 

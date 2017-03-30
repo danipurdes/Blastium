@@ -65,14 +65,6 @@ function updatePlayState(dt)
                 s.removal_flag = true
                 world.score = world.score + enemy.score
 
-                --enemy drops a coin
-                --local co = {}
-                --co.x = v.x
-                --co.y = v.y
-                --co.radius = coin.radius
-                --co.removal_flag = false
-                --table.insert(coins, co)
-
                 initiateScreenshake()
                 love.audio.play(enemy.damage_sound)
               end
@@ -195,12 +187,6 @@ function updatePlayState(dt)
           table.remove(asteroids, i)
       end
     end
-
-    --for i=#coins, 1, -1 do
-      --if coins[i].removal_flag then
-          --table.remove(coins, i)
-      --end
-    --end
 end
 
 function keypressedPlayState(key)
@@ -229,14 +215,6 @@ function drawPlayState()
     for i,a in ipairs(asteroids) do
       love.graphics.draw(a.image, a.x, a.y, a.spin, 2, 2, a.image:getWidth()/2, a.image:getHeight()/2)
     end
-
-    --love.graphics.setColor(coin.red, coin.green, coin.blue)
-    --for i,c in ipairs(coins) do
-      --love.graphics.ellipse("fill", c.x, c.y, c.radius, c.radius)
-    --end
-
-    --love.graphics.setColor(200,200,200)
-    --love.graphics.ellipse("fill", shop.x, shop.y, shop.radius, shop.radius)
 
     love.graphics.setColor(255,255,255)
     drawShots()

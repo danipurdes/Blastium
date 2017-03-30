@@ -2,7 +2,9 @@ love.graphics.setDefaultFilter("nearest", "nearest")
 
 utilities = require "utilities"
 
+splashscreen = require "splashscreen"
 world = require "world"
+
 play = require "play_state"
 fonts = require "fonts"
 audio = require "audio"
@@ -136,31 +138,35 @@ function loadGame()
 end
 
 function love.update(dt)
+  world.stateChangeOccurred = false
   updateStarfield(dt)
   updateAudioIcon(dt)
 
-  if world.state == "start/open" then
-        if not logo_anim.done then
-            logo_anim.t = logo_anim.t + dt
-            if logo_anim.t >= logo_anim.lifespan then
-                logo_anim.t = logo_anim.lifespan
-                logo_anim.done = true
-            end
-        end
+  if world.state == "splashscreen" then
+    updateSplashscreen(dt)
 
-        if title_anim.direction == "f" then
-            title_anim.t = math.min(title_anim.lifespan, title_anim.t + dt)
-            if title_anim.t == title_anim.lifespan then
-                title_anim.direction = "b"
-            end
-        elseif title_anim.direction == "b" then
-            title_anim.t = math.max(0, title_anim.t - dt)
-            if title_anim.t == 0 then
-                title_anim.direction = "f"
-            end
+  elseif world.state == "start/open" and not world.stateChangeOccurred then
+    if not logo_anim.done then
+        logo_anim.t = logo_anim.t + dt
+        if logo_anim.t >= logo_anim.lifespan then
+            logo_anim.t = logo_anim.lifespan
+            logo_anim.done = true
         end
+    end
 
-  elseif world.state == "play" then
+    if title_anim.direction == "f" then
+        title_anim.t = math.min(title_anim.lifespan, title_anim.t + dt)
+        if title_anim.t == title_anim.lifespan then
+            title_anim.direction = "b"
+        end
+    elseif title_anim.direction == "b" then
+        title_anim.t = math.max(0, title_anim.t - dt)
+        if title_anim.t == 0 then
+            title_anim.direction = "f"
+        end
+    end
+
+  elseif world.state == "play" and not world.stateChangeOccurred then
       updatePlayState(dt)
   end
 end
@@ -170,7 +176,12 @@ function love.keypressed(key)
     toggleMute()
   end
 
-  if world.state == "start/open" then
+  if world.state == "splashscreen" then
+    if key == "space" then
+        worldStateChange("start/open")
+    end
+
+  elseif world.state == "start/open" then
       if key == "space" then
         if not logo_anim.done then
             logo_anim.t = logo_anim.lifespan
@@ -223,15 +234,14 @@ function despawnAsteroids()
     asteroids = {}
 end
 
-function despawnCoins()
-    coins = {}
-end
-
 function love.draw()
   love.graphics.clear(20,20,20)
   love.graphics.setColor(255, 255, 255)
 
-  if world.state == "start/open" then
+  if world.state == "splashscreen" then
+    drawSplashscreen()
+
+  elseif world.state == "start/open" then
       drawStarfield()
 
       love.graphics.setColor(255, 255, 255)

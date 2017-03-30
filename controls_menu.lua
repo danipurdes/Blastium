@@ -1,4 +1,5 @@
 controls_menu = {}
+controls_menu.grid = love.graphics.newImage("assets/images/grid_600.png")
 
 function keypressedControlsMenu(key)
     if key == "escape" then
@@ -12,6 +13,9 @@ function drawControlsMenu()
 
     love.graphics.setColor(100,100,100,100)
     love.graphics.rectangle("fill", 0, 0, world.width, world.height)
+
+    love.graphics.setColor(200,200,200,255)
+    love.graphics.draw(controls_menu.grid, 0, 0)
 
     love.graphics.setColor(0,0,0,255)
     love.graphics.rectangle("fill", 150, 150, 300, 300)
