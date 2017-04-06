@@ -1,38 +1,48 @@
 player = {}
+
 player.active = true
+player.state = "alive"
 player.x = 0
 player.y = 0
 player.xvel = 0
 player.yvel = 0
 player.rotation = 0
 player.ANGACCEL = 0
+
 player.image = love.graphics.newImage("assets/images/ship_bosco.png")
+player.thrust_sound = love.audio.newSource("assets/audio/ship_thruster3.wav")
 player.damage_sound = love.audio.newSource("assets/audio/player_damage.wav","static")
 player.death_sound = love.audio.newSource("assets/audio/player_death.wav","static")
-player.weapon_index = 0
+
 player.rotation_speed = 180
 player.acceleration = 400
 player.drag = 399
 player.max_speed = 400
+
 player.health = 5
 player.health_max = 5
+
 player.isHurt = false
 player.hurtCooldown = 1
 player.hurtTimer = 1
-player.coins = 0
+player.death_fadeout_timer = 2
+player.death_fadeout_cooldown = 2
 
 function loadPlayer()
     player.active = true
+    player.state = "alive"
+
     player.x = world.width / 2
     player.y = world.height / 2
     player.rotation = 3 * math.pi / 2
     player.xvel = 0
     player.yvel = 0
     player.health = 5
-    player.coins = 0
     player.hurt = false
-    player.hurtTimer = 1
-    player.hurtCooldown = 1
+
+    player.hurtTimer = player.hurtCooldown
+    player.death_fadeout_timer = player.death_fadeout_cooldown
+
     world.score = 0
     world.high_score_flag = false
 end
@@ -52,30 +62,30 @@ function playerMovement(dt)
     --player.rotation = player.rotation + player.ROTATION_S * dt
 
 
-    if love.keyboard.isDown("u") then
+    --if love.keyboard.isDown("u") then
         -- orbit
 
         -- find the center of the orbit point
-        local distanceToOrbitCenter = 300 --60
-        local orbitCenterX = player.x + math.cos(player.rotation) * distanceToOrbitCenter
-        local orbitCenterY = player.y + math.sin(player.rotation) * distanceToOrbitCenter
+    --    local distanceToOrbitCenter = 300 --60
+    --    local orbitCenterX = player.x + math.cos(player.rotation) * distanceToOrbitCenter
+    --    local orbitCenterY = player.y + math.sin(player.rotation) * distanceToOrbitCenter
 
         -- find the destination rotation
-        local rotVel = math.pi / 3
-        local orbitRot = math.pi + player.rotation
-        orbitRot = orbitRot + rotVel * dt
-        player.rotation = math.pi + orbitRot
+    --    local rotVel = math.pi / 3
+    --    local orbitRot = math.pi + player.rotation
+    --    orbitRot = orbitRot + rotVel * dt
+    --    player.rotation = math.pi + orbitRot
 
         -- set the ship to be at the destination rotation
         --player.x = math.cos(orbitRot) * distanceToOrbitCenter + orbitCenterX
         --player.y = math.sin(orbitRot) * distanceToOrbitCenter + orbitCenterY
 
         -- flub the velocity
-        local tangentVectorAngle = (player.rotation + (math.pi + math.pi / 2))
-        local linearVel = rotVel * (distanceToOrbitCenter)
-        player.xvel = player.xvel + dt * math.cos(tangentVectorAngle) * linearVel
-        player.yvel = player.yvel + dt * math.sin(tangentVectorAngle) * linearVel
-    end
+    --    local tangentVectorAngle = (player.rotation + (math.pi + math.pi / 2))
+    --    local linearVel = rotVel * (distanceToOrbitCenter)
+    --    player.xvel = player.xvel + dt * math.cos(tangentVectorAngle) * linearVel
+    --    player.yvel = player.yvel + dt * math.sin(tangentVectorAngle) * linearVel
+    --end
 
     --if love.keyboard.isDown("i") then
         -- orbit
@@ -113,6 +123,8 @@ function playerMovement(dt)
             -- accelerate
             player.xvel = player.xvel + player.acceleration * dt * math.cos(player.rotation)
             player.yvel = player.yvel + player.acceleration * dt * math.sin(player.rotation)
+            love.audio.stop(player.thrust_sound)
+            love.audio.play(player.thrust_sound)
         end
 
         --dragrate = player.drag * dt
@@ -143,7 +155,7 @@ function playerMovement(dt)
     bullet_weapon.firing_rate_current = math.max(0, bullet_weapon.firing_rate_current - dt)
     shell_weapon.firing_rate_current = math.max(0, shell_weapon.firing_rate_current - dt)
 
-    if love.keyboard.isDown("k") then
+    if love.keyboard.isDown("up") then
         fire_bullet_weapon()
     end
 
@@ -215,14 +227,16 @@ function onPlayerDamage(x, y)
 end
 
 function onPlayerDeath()
-    player.active = false
+    --player.active = false
+    player.state = "dead"
 
     if world.high_score < world.score then
         world.high_score = world.score
         world.high_score_flag = true
     end
 
-    worldStateChange("end")
+    --worldStateChange("end")
+    player.death_fadeout_timer = player.death_fadeout_cooldown
     love.audio.play(player.death_sound)
 end
 

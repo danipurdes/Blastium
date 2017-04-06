@@ -1,16 +1,19 @@
 world = {}
-world.name = "BLASTIUM"
+
 world.width = 600
 world.height = 600
 world.state = "splashscreen"
 world.previous_state = "splashscreen"
+world.stateChangeOccurred = false
+
 world.score = 0
 world.high_score = 0
 world.high_score_flag = false
+
 world.logo = love.graphics.newImage("assets/images/blastium_logo.png")
+
 world.game_timer = 500
 world.game_cooldown = 500
-world.stateChangeOccurred = false
 
 world.menu_index_change_sound = love.audio.newSource("assets/audio/menu_index_change.wav","static")
 world.menu_index_select_sound = love.audio.newSource("assets/audio/menu_index_select.wav","static")

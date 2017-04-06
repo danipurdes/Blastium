@@ -2,12 +2,16 @@ spawner = {}
 
 spawner.asteroid_spawn_timer = 5
 spawner.asteroid_spawn_cooldown = 5
+spawner.asteroid_count = 0
 
 spawner.enemy_fleet_timer = 8
 spawner.enemy_fleet_cooldown = 8
 
 spawner.enemy_timer = .5
 spawner.enemy_cooldown = .5
+
+spawner.enemy_total_count = 0
+spawner.enemy_total_cap = 15
 
 spawner.enemy_count = 6
 spawner.enemy_total = 6
@@ -18,6 +22,8 @@ spawner.fleet_angle = 0
 
 function loadSpawner()
     spawner.asteroid_spawn_timer = 5
+    spawner.asteroid_count = 0
+
     spawner.enemy_fleet_timer = 8
     spawner.enemy_timer = .5
     spawner.enemy_count = 0
@@ -25,9 +31,12 @@ end
 
 function updateSpawner(dt)
     spawner.asteroid_spawn_timer = spawner.asteroid_spawn_timer - dt
+
     if spawner.asteroid_spawn_timer <= 0 then
-        --spawnAsteroid16()
-        spawnAsteroid32()
+        if spawner.asteroid_count + asteroid_32.size <= 6 then
+            spawnAsteroid32()
+            spawner.asteroid_count = spawner.asteroid_count + asteroid_32.size
+        end
         spawner.asteroid_spawn_timer = spawner.asteroid_spawn_cooldown
     end
 
@@ -43,9 +52,12 @@ function updateSpawner(dt)
     else
         spawner.enemy_timer = spawner.enemy_timer - dt
         if spawner.enemy_timer <= 0 then
-            spawnEnemy(spawner.fleet_mag, spawner.fleet_side, spawner.fleet_angle)
+            if spawner.enemy_total_count < spawner.enemy_total_cap then
+                spawnEnemy(spawner.fleet_mag, spawner.fleet_side, spawner.fleet_angle)
+                spawner.enemy_count = spawner.enemy_count - 1
+                spawner.enemy_total_count = spawner.enemy_total_count + 1
+            end
             spawner.enemy_timer = spawner.enemy_cooldown
-            spawner.enemy_count = spawner.enemy_count - 1
         end
     end
 end
@@ -62,6 +74,7 @@ function spawnEnemy(fMag, fSide, fAngle)
     e.y = y
     e.speed = enemy.speed
     e.image = enemy.image
+    e.radius = enemy.radius
     e.mode = "rotate"
     e.rotation_influence = 1
     e.removal_flag = false
@@ -89,7 +102,7 @@ function spawnEnemy(fMag, fSide, fAngle)
 end
 
 function spawnAsteroid32()
-    local side = love.math.random(0,3)
+    local side = 0 --love.math.random(0,3)
     local mag = love.math.random(50,550)
     local x = 0
     local y = 0

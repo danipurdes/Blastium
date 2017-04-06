@@ -52,6 +52,7 @@ enemy = {
     x = 0,
     y = 0,
     rotation = 0,
+    radius = 6,
     velX = 0,
     velY = 0,
     speed = 90,
@@ -60,6 +61,16 @@ enemy = {
     score = 200,
     rotation_timer = 1,
     rotation_cooldown = 1
+}
+
+particles = {}
+
+explosion_particle = {
+    x = 0,
+    y = 0,
+    lifespan = .05,
+    age = 0,
+    image = love.graphics.newImage("assets/images/enemy_explosion.png")
 }
 
 asteroids = {}
@@ -73,7 +84,8 @@ asteroid_32 = {
     radius = 32,
     removal_flag = false,
     type = 32,
-    score = 25
+    score = 25,
+    size = 4
 }
 
 asteroid_16 = {
@@ -85,7 +97,8 @@ asteroid_16 = {
     radius = 16,
     removal_flag = false,
     type = 16,
-    score = 50
+    score = 50,
+    size = 2
 }
 
 asteroid_8 = {
@@ -97,7 +110,8 @@ asteroid_8 = {
     radius = 8,
     removal_flag = false,
     type = 8,
-    score = 100
+    score = 100,
+    size = 1
 }
 
 function toMainMenu()
@@ -245,8 +259,6 @@ function love.draw()
       drawStarfield()
 
       love.graphics.setColor(255, 255, 255)
-      --love.graphics.setFont(fonts.title_font)
-      --love.graphics.printf(world.name, 0, lerp(logo_anim.start_y, logo_anim.t, logo_anim.end_y, logo_anim.lifespan), world.width, "center")
       love.graphics.draw(world.logo, 300, lerp(logo_anim.start_y, logo_anim.t, logo_anim.end_y, logo_anim.lifespan), 0, 4, 4, world.logo:getWidth()/2, world.logo:getHeight()/2)
       love.graphics.setFont(fonts.font_text)
 
