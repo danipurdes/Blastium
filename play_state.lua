@@ -110,6 +110,70 @@ function updatePlayState(dt)
         end
     end
 
+    if not (lancer.state == "dead") then
+        lancer.x = lancer.x + dt * lancer.speed * math.cos(lancer.rotation)
+        lancer.y = lancer.y + dt * lancer.speed * math.sin(lancer.rotation)
+        if lancer.state == "preparing" then
+            lancer.prep_age = lancer.prep_age + dt
+            lancer.rotation = math.atan2(player.y - lancer.y, player.x - lancer.x)
+            if lancer.prep_age >= lancer.prep_duration then
+                lancer.state = "charging"
+                lancer.speed = lancer.charge_speed
+                lancer.prep_age = 0
+            end
+        elseif lancer.state == "charging" then
+            local outb = false
+            if lancer.x >= world.width + 16 then
+                outb = true
+                lancer.recover_tgt_x = world.width - 32
+                lancer.recover_tgt_y = lancer.y
+                if lancer.y <= 0 then
+                    lancer.recover_tgt_y = 32
+                elseif lancer.y >= world.height then
+                    lancer.recover_tgt_y = world.height - 32
+                end
+            elseif lancer.x <= -16 then
+                outb = true
+                lancer.recover_tgt_x = 32
+                lancer.recover_tgt_y = lancer.y
+                if lancer.y <= 0 then
+                    lancer.recover_tgt_y = 32
+                elseif lancer.y >= world.height then
+                    lancer.recover_tgt_y = world.height - 32
+                end
+            elseif lancer.y >= world.height + 16 then
+                outb = true
+                lancer.recover_tgt_y = world.height - 32
+                lancer.recover_tgt_x = lancer.x
+                if lancer.x <= 0 then
+                    lancer.recover_tgt_x = 32
+                elseif lancer.x >= world.width then
+                    lancer.recover_tgt_x = world.width - 32
+                end
+            elseif lancer.y <= -16 then
+                outb = true
+                lancer.recover_tgt_y = 32
+                lancer.recover_tgt_x = lancer.x
+                if lancer.x <= 0 then
+                    lancer.recover_tgt_x = 32
+                elseif lancer.x >= world.width then
+                    lancer.recover_tgt_x = world.width - 32
+                end
+            end
+
+            if outb then
+                lancer.state = "recovering"
+                lancer.speed = lancer.recover_speed
+                lancer.rotation = math.atan2(lancer.recover_tgt_y - lancer.y, lancer.recover_tgt_x - lancer.x)
+            end
+        elseif lancer.state == "recovering" then
+            if lancer.x > 32 and lancer.x < world.width - 32 and lancer.y > 32 and lancer.y < world.height - 32 then
+                lancer.state = "preparing"
+                lancer.speed = lancer.prep_speed
+            end
+        end
+    end
+
     for i,a in ipairs(particles) do
         a.age = a.age + dt
         if a.age >= a.lifespan then
@@ -239,6 +303,10 @@ function keypressedPlayState(key)
       fire_shell_weapon()
     end
 
+    if key == "space" then
+        world.game_timer = world.game_timer * .95
+    end
+
     if key == "p" then
       worldStateChange("pause")
       menuIndexSelect()
@@ -256,6 +324,8 @@ function drawPlayState()
       local v = enemies[i]
       love.graphics.draw(v.image, v.x, v.y, v.rotation, 2, 2, v.image:getWidth()/2, v.image:getHeight()/2)
     end
+
+    love.graphics.draw(lancer.image, lancer.x, lancer.y, lancer.rotation, 2, 2, lancer.image:getWidth()/2, lancer.image:getWidth()/2)
 
     for i,a in ipairs(asteroids) do
       love.graphics.draw(a.image, a.x, a.y, a.spin, 2, 2, a.image:getWidth()/2, a.image:getHeight()/2)

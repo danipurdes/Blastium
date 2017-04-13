@@ -27,6 +27,8 @@ function loadSpawner()
     spawner.enemy_fleet_timer = 8
     spawner.enemy_timer = .5
     spawner.enemy_count = 0
+
+    spawner.enemy_total_count = 0
 end
 
 function updateSpawner(dt)
