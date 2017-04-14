@@ -11,10 +11,10 @@ spawner.enemy_timer = .5
 spawner.enemy_cooldown = .5
 
 spawner.enemy_total_count = 0
-spawner.enemy_total_cap = 15
+spawner.enemy_total_cap = 9
 
-spawner.enemy_count = 6
-spawner.enemy_total = 6
+spawner.enemy_count = 3
+spawner.enemy_total = 3
 
 spawner.fleet_mag = 0
 spawner.fleet_side = 0
@@ -29,6 +29,9 @@ function loadSpawner()
     spawner.enemy_count = 0
 
     spawner.enemy_total_count = 0
+
+    spawnSalvo(100,200)
+    spawnSalvo(500,500)
 end
 
 function updateSpawner(dt)

@@ -45,6 +45,8 @@ logo_anim = {
 }
 
 enemies = {}
+salvos = {}
+lancers = {}
 
 enemy = {
     image = love.graphics.newImage("assets/images/enemy_bat.png"),
@@ -63,24 +65,8 @@ enemy = {
     rotation_cooldown = 1
 }
 
-lancer = {
-    image = love.graphics.newImage("assets/images/enemy_lancer.png"),
-    x = 50,
-    y = 50,
-    rotation = 0,
-    radius = 8,
-    speed = -2.5,
-    removal_flag = false,
-    score = 500,
-    state = "preparing",
-    prep_age = 0,
-    prep_duration = 5,
-    prep_speed = -2.5,
-    charge_speed = 300,
-    recover_tgt_x = 0,
-    recover_tgt_y = 0,
-    recover_speed = 30
-}
+lancer = require "lancer"
+salvo = require "salvo"
 
 particles = {}
 

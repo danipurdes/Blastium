@@ -110,74 +110,26 @@ function updatePlayState(dt)
         end
     end
 
-    if not (lancer.state == "dead") then
-        lancer.x = lancer.x + dt * lancer.speed * math.cos(lancer.rotation)
-        lancer.y = lancer.y + dt * lancer.speed * math.sin(lancer.rotation)
-        if lancer.state == "preparing" then
-            lancer.prep_age = lancer.prep_age + dt
-            lancer.rotation = math.atan2(player.y - lancer.y, player.x - lancer.x)
-            if lancer.prep_age >= lancer.prep_duration then
-                lancer.state = "charging"
-                lancer.speed = lancer.charge_speed
-                lancer.prep_age = 0
-            end
-        elseif lancer.state == "charging" then
-            local outb = false
-            if lancer.x >= world.width + 16 then
-                outb = true
-                lancer.recover_tgt_x = world.width - 32
-                lancer.recover_tgt_y = lancer.y
-                if lancer.y <= 0 then
-                    lancer.recover_tgt_y = 32
-                elseif lancer.y >= world.height then
-                    lancer.recover_tgt_y = world.height - 32
-                end
-            elseif lancer.x <= -16 then
-                outb = true
-                lancer.recover_tgt_x = 32
-                lancer.recover_tgt_y = lancer.y
-                if lancer.y <= 0 then
-                    lancer.recover_tgt_y = 32
-                elseif lancer.y >= world.height then
-                    lancer.recover_tgt_y = world.height - 32
-                end
-            elseif lancer.y >= world.height + 16 then
-                outb = true
-                lancer.recover_tgt_y = world.height - 32
-                lancer.recover_tgt_x = lancer.x
-                if lancer.x <= 0 then
-                    lancer.recover_tgt_x = 32
-                elseif lancer.x >= world.width then
-                    lancer.recover_tgt_x = world.width - 32
-                end
-            elseif lancer.y <= -16 then
-                outb = true
-                lancer.recover_tgt_y = 32
-                lancer.recover_tgt_x = lancer.x
-                if lancer.x <= 0 then
-                    lancer.recover_tgt_x = 32
-                elseif lancer.x >= world.width then
-                    lancer.recover_tgt_x = world.width - 32
-                end
-            end
-
-            if outb then
-                lancer.state = "recovering"
-                lancer.speed = lancer.recover_speed
-                lancer.rotation = math.atan2(lancer.recover_tgt_y - lancer.y, lancer.recover_tgt_x - lancer.x)
-            end
-        elseif lancer.state == "recovering" then
-            if lancer.x > 32 and lancer.x < world.width - 32 and lancer.y > 32 and lancer.y < world.height - 32 then
-                lancer.state = "preparing"
-                lancer.speed = lancer.prep_speed
-            end
-        end
+    updateLancer(dt)
+    for i,s in ipairs(salvos) do
+        updateSalvo(s, dt)
     end
 
     for i,a in ipairs(particles) do
         a.age = a.age + dt
         if a.age >= a.lifespan then
             a.removal_flag = true
+        end
+    end
+
+    for i,m in ipairs(salvo.missiles) do
+        if circle_overlap(player.x, player.y, 16, m.x, m.y, m.radius) then
+          initiateScreenshake()
+          love.audio.play(player.damage_sound)
+          m.removal_flag = true
+          if onPlayerDamage(m.x, m.y) then
+              return
+          end
         end
     end
 
@@ -247,19 +199,7 @@ function updatePlayState(dt)
           if circle_overlap(player.x, player.y, 16, a.x, a.y, a.radius) then
             initiateScreenshake()
             love.audio.play(player.damage_sound)
-            local xVect = player.x - a.x
-            local yVect = player.y - a.y
-            local mVect = distance(player.x, player.y, a.x, a.y)
-            local xMag = xVect / mVect
-            local yMag = yVect / mVect
-            local xImp = xMag * 50
-            local yImp = yMag * 50
-            local axv = a.speed * math.cos(a.rotation)
-            local ayv = a.speed * math.sin(a.rotation)
-            axv = axv - xImp
-            ayv = ayv - yImp
-            --a.speed = math.sqrt(axv*axv + ayv*ayv)
-            a.rotation = math.atan2(axv, ayv)
+            a.rotation = math.atan2(a.y, player.y, a.x, player.x)
             if onPlayerDamage(a.x, a.y) then
                 return
             end
@@ -270,6 +210,12 @@ function updatePlayState(dt)
     for i=#enemies, 1, -1 do
       if enemies[i].removal_flag then
           table.remove(enemies, i)
+      end
+    end
+
+    for i=#salvo.missiles, 1, -1 do
+      if salvo.missiles[i].removal_flag then
+          table.remove(salvo.missiles, i)
       end
     end
 
@@ -326,6 +272,14 @@ function drawPlayState()
     end
 
     love.graphics.draw(lancer.image, lancer.x, lancer.y, lancer.rotation, 2, 2, lancer.image:getWidth()/2, lancer.image:getWidth()/2)
+
+    for i,s in ipairs(salvos) do
+        love.graphics.draw(s.draw_image, s.x, s.y, s.rotation, 2, 2, s.image:getWidth()/2, s.image:getWidth()/2)
+    end
+
+    for i,m in ipairs(salvo.missiles) do
+        love.graphics.draw(salvo.missile_image, m.x, m.y, m.rotation, 1, 1, salvo.missile_image:getWidth()/2, salvo.missile_image:getHeight()/2)
+    end
 
     for i,a in ipairs(asteroids) do
       love.graphics.draw(a.image, a.x, a.y, a.spin, 2, 2, a.image:getWidth()/2, a.image:getHeight()/2)
