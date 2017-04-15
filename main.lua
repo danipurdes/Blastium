@@ -130,7 +130,7 @@ end
 function love.load()
     love.graphics.setDefaultFilter("nearest", "nearest")
     audio.music:setLooping(true)
-    audio.music:setVolume(.25)
+    audio.music:setVolume(.1)
     love.audio.setVolume(audio.volume_max)
     audio.volume_current = audio.volume_max
     audio.music:play()
@@ -145,6 +145,9 @@ end
 
 function loadGame()
     despawnEnemies()
+    despawnLancers()
+    despawnSalvos()
+    despawnMissiles()
     despawnBullets()
     despawnShells()
     despawnAsteroids()
@@ -235,22 +238,6 @@ function love.keypressed(key)
         worldStateChange("start/main")
       end
   end
-end
-
-function despawnEnemies()
-    enemies = {}
-end
-
-function despawnBullets()
-    bullet_weapon.shots = {}
-end
-
-function despawnShells()
-    shell_weapon.shots = {}
-end
-
-function despawnAsteroids()
-    asteroids = {}
 end
 
 function love.draw()

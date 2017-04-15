@@ -1,6 +1,6 @@
 audio = {}
-audio.volume_max = .5
-audio.volume_current = .5
+audio.volume_max = 1
+audio.volume_current = 1
 audio.music = love.audio.newSource("assets/audio/Busy Signal - Beatwave.wav")
 audio.mute = false
 audio.icon_sound = love.graphics.newImage("assets/images/icon_sound.png")

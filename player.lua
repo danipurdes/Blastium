@@ -8,6 +8,7 @@ player.xvel = 0
 player.yvel = 0
 player.rotation = 0
 player.ANGACCEL = 0
+player.radius = 8
 
 player.image = love.graphics.newImage("assets/images/ship_bosco.png")
 player.thrust_sound = love.audio.newSource("assets/audio/ship_thruster3.wav")

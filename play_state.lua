@@ -45,17 +45,17 @@ function updatePlayState(dt)
           v.rotation = v.rotation + 2 * dt * enemy.rotation_influence
         end
 
-        if v.x > world.width then
-          v.x = v.x - world.width
-        elseif v.x < 0 then
-          v.x = v.x + world.width
-        end
+        --if v.x > world.width then
+        --  v.x = v.x - world.width
+        --elseif v.x < 0 then
+        --  v.x = v.x + world.width
+        --end
 
-        if v.y > world.height then
-          v.y = v.y - world.height
-        elseif v.y < 0 then
-          v.y = v.y + world.height
-        end
+        --if v.y > world.height then
+        --  v.y = v.y - world.height
+        --elseif v.y < 0 then
+        --  v.y = v.y + world.height
+        --end
 
         if circle_overlap(player.x, player.y, 16, v.x, v.y, v.radius) then
           initiateScreenshake()
@@ -110,7 +110,10 @@ function updatePlayState(dt)
         end
     end
 
-    updateLancer(dt)
+    for i,l in ipairs(lancers) do
+        updateLancer(l, dt)
+    end
+
     for i,s in ipairs(salvos) do
         updateSalvo(s, dt)
     end
@@ -119,6 +122,56 @@ function updatePlayState(dt)
         a.age = a.age + dt
         if a.age >= a.lifespan then
             a.removal_flag = true
+        end
+    end
+
+    for i,l in ipairs(lancers) do
+        if circle_overlap(player.x, player.y, player.radius, l.x, l.y, l.radius) then
+            initiateScreenshake()
+            love.audio.play(player.damage_sound)
+            l.removal_flag = true
+            if onPlayerDamage(l.x, l.y) then
+                return
+            end
+        end
+
+        for i,b in ipairs(bullet_weapon.shots) do
+            if circle_overlap(b.x, b.y, 4, l.x, l.y, l.radius) then
+                b.removal_flag = true
+                l.removal_flag = true
+            end
+        end
+
+        for i,s in ipairs(shell_weapon.shots) do
+            if circle_overlap(s.x, s.y, 4, l.x, l.y, l.radius) then
+                s.removal_flag = true
+                l.removal_flag = true
+            end
+        end
+    end
+
+    for i,l in ipairs(salvos) do
+        if circle_overlap(player.x, player.y, player.radius, l.x, l.y, l.radius) then
+            initiateScreenshake()
+            love.audio.play(player.damage_sound)
+            l.removal_flag = true
+            if onPlayerDamage(l.x, l.y) then
+                return
+            end
+        end
+
+        for i,b in ipairs(bullet_weapon.shots) do
+            if circle_overlap(b.x, b.y, 4, l.x, l.y, l.radius) then
+                b.removal_flag = true
+                l.removal_flag = true
+            end
+        end
+
+        for i,s in ipairs(shell_weapon.shots) do
+            if circle_overlap(s.x, s.y, 4, l.x, l.y, l.radius) then
+                s.removal_flag = true
+                l.removal_flag = true
+            end
         end
     end
 
@@ -213,6 +266,18 @@ function updatePlayState(dt)
       end
     end
 
+    for i=#lancers, 1, -1 do
+      if lancers[i].removal_flag then
+          table.remove(lancers, i)
+      end
+    end
+
+    for i=#salvos, 1, -1 do
+      if salvos[i].removal_flag then
+          table.remove(salvos, i)
+      end
+    end
+
     for i=#salvo.missiles, 1, -1 do
       if salvo.missiles[i].removal_flag then
           table.remove(salvo.missiles, i)
@@ -271,10 +336,12 @@ function drawPlayState()
       love.graphics.draw(v.image, v.x, v.y, v.rotation, 2, 2, v.image:getWidth()/2, v.image:getHeight()/2)
     end
 
-    love.graphics.draw(lancer.image, lancer.x, lancer.y, lancer.rotation, 2, 2, lancer.image:getWidth()/2, lancer.image:getWidth()/2)
+    for i,l in ipairs(lancers) do
+        love.graphics.draw(l.draw_image, l.x, l.y, l.rotation, 2, 2, l.draw_image:getWidth()/2, l.draw_image:getWidth()/2)
+    end
 
     for i,s in ipairs(salvos) do
-        love.graphics.draw(s.draw_image, s.x, s.y, s.rotation, 2, 2, s.image:getWidth()/2, s.image:getWidth()/2)
+        love.graphics.draw(s.draw_image, s.x, s.y, s.rotation, 2, 2, s.draw_image:getWidth()/2, s.draw_image:getWidth()/2)
     end
 
     for i,m in ipairs(salvo.missiles) do

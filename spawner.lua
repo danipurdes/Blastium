@@ -32,6 +32,9 @@ function loadSpawner()
 
     spawnSalvo(100,200)
     spawnSalvo(500,500)
+
+    spawnLancer(500,200)
+    spawnLancer(100,500)
 end
 
 function updateSpawner(dt)
@@ -178,6 +181,34 @@ function spawnAsteroids8(x, y, p_rot)
         ast.type = 8
         table.insert(asteroids, ast)
     end
+end
+
+function despawnEnemies()
+    enemies = {}
+end
+
+function despawnLancers()
+    lancers = {}
+end
+
+function despawnSalvos()
+    salvos = {}
+end
+
+function despawnMissiles()
+    salvo.missiles = {}
+end
+
+function despawnBullets()
+    bullet_weapon.shots = {}
+end
+
+function despawnShells()
+    shell_weapon.shots = {}
+end
+
+function despawnAsteroids()
+    asteroids = {}
 end
 
 return spawner
