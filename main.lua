@@ -14,6 +14,7 @@ hud = require "hud"
 screenshake = require "screenshake"
 spawn_formations = require "spawn_formations"
 spawner = require "spawner"
+highscore = require "highscore"
 
 --weapons
 bullet_weapon = require "bullet_weapon"
@@ -27,6 +28,8 @@ controls_menu = require "controls_menu"
 pause_menu = require "pause_menu"
 options_menu = require "options_menu"
 credits_menu = require "credits_menu"
+
+success = false
 
 title_anim = {
     lifespan = 1.5,
@@ -129,11 +132,17 @@ end
 
 function love.load()
     love.graphics.setDefaultFilter("nearest", "nearest")
+    --love.window.setIcon(window_icon)
     audio.music:setLooping(true)
     audio.music:setVolume(.1)
     love.audio.setVolume(audio.volume_max)
     audio.volume_current = audio.volume_max
     audio.music:play()
+
+    --success = love.filesystem.write("data.txt","4000 PABLO")
+    --contents = love.filesystem.read("data.txt")
+
+    loadHighscores()
 
     while #starfield.stars < starfield.count do
         local star = {}
@@ -244,6 +253,12 @@ function love.draw()
   love.graphics.clear(20,20,20)
   love.graphics.setColor(255, 255, 255)
 
+  --love.graphics.setFont(fonts.font_text)
+  --love.graphics.printf(highscore.save_contents, 0, 200, world.width, "center")
+  --love.graphics.printf(highscore.score, 0, 220, world.width, "center")
+  --love.graphics.printf(highscore.name, 0, 240, world.width, "center")
+  love.graphics.setColor(255,255,255)
+
   if world.state == "splashscreen" then
     drawSplashscreen()
 
@@ -285,18 +300,20 @@ function love.draw()
       love.graphics.setColor(255,255,255)
 
       local end_text = ""
+      local score_text = "SCORE : " .. world.score
+      local high_score_text = "HIGH SCORE : " .. highscore.score
+
+      love.graphics.setFont(fonts.font_text)
       if world.high_score_flag then
         end_text = "- NEW HIGH SCORE -"
+        love.graphics.printf(end_text, 0, world.height / 2 - 20, world.width, "center")
+        love.graphics.printf(score_text, 0, world.height / 2 , world.width, "center")
       else
         end_text = "- GAME OVER -"
+        love.graphics.printf(end_text, 0, world.height / 2 - 20, world.width, "center")
+        love.graphics.printf(score_text, 0, world.height / 2 , world.width, "center")
+        love.graphics.printf(high_score_text, 0, world.height / 2 + 20, world.width, "center")
       end
-
-      local score_text = "SCORE : " .. world.score
-      local high_score_text = "HIGH SCORE : " .. world.high_score
-      love.graphics.setFont(fonts.font_text)
-      love.graphics.printf(end_text, 0, world.height / 2 - 20, world.width, "center")
-      love.graphics.printf(score_text, 0, world.height / 2 , world.width, "center")
-      love.graphics.printf(high_score_text, 0, world.height / 2 + 20, world.width, "center");
   end
 
   drawAudioIcon()

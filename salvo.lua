@@ -65,6 +65,7 @@ function updateSalvo(sa, dt)
                     m.radius = 8
                     m.rotation = sa.rotation
                     m.removal_flag = false
+                    m.score = 10
                     table.insert(salvo.missiles, m)
                     sa.firing_count = sa.firing_count + 1
                 end
@@ -77,7 +78,7 @@ function updateSalvo(sa, dt)
         m.y = m.y + dt * m.speed * math.sin(m.rotation)
         m.age = m.age + dt
         m.speed = math.exp(1.75*(m.age+2))-100
-        if m.x < 0 or m.x > world.width or m.y < 0 or m.y > world.height then
+        if m.x < -20 or m.x > world.width + 20 or m.y < -20 or m.y > world.height + 20 then
             m.removal_flag = true
         end
     end

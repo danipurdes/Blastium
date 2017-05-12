@@ -16,8 +16,12 @@ function drawHUD()
 
     love.graphics.setColor(255,255,255)
     love.graphics.setFont(fonts.font_hud)
-    love.graphics.printf("SCORE", 10, 10, world.width - 150, "right")
-    love.graphics.printf(world.score, 10, 30, world.width - 150, "right")
+
+    love.graphics.printf("HIGHSCORE", 10, 10, world.width - 280, "right")
+    love.graphics.printf(highscore.score, 10, 30, world.width - 280, "right")
+
+    love.graphics.printf("SCORE", 10, 10, world.width - 190, "right")
+    love.graphics.printf(world.score, 10, 30, world.width - 190, "right")
 
     love.graphics.printf("HEALTH", 10, 10, world.width - 24, "right")
     for i=0,player.health-1 do

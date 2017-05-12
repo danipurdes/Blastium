@@ -1,4 +1,5 @@
 function love.conf(t)
+   t.identity = "save"
    t.console = false
    t.title = "Blastium"
 
@@ -9,6 +10,9 @@ function love.conf(t)
    t.window.borderless = false
    t.window.resizable = false
    t.window.vsync = false
+   t.window.icon = "assets/images/blastium_icon.png"
+
+   t.window.msaa = 9
 
    --t.identity = nil                    -- The name of the save directory (string)
    --t.version = "0.10.1"                  -- The LÖVE version this game was made for (string)

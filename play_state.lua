@@ -13,7 +13,7 @@ function updatePlayState(dt)
       playerMovement(dt)
     end
 
-    world.game_timer = world.game_timer - dt
+    --world.game_timer = world.game_timer - dt
     if world.game_timer <= 0 then
       worldStateChange("end")
     end
@@ -42,20 +42,20 @@ function updatePlayState(dt)
         end
 
         if v.mode == "rotate" then
-          v.rotation = v.rotation + 2 * dt * enemy.rotation_influence
+          --v.rotation = v.rotation + 2 * dt * enemy.rotation_influence
         end
 
-        --if v.x > world.width then
-        --  v.x = v.x - world.width
-        --elseif v.x < 0 then
-        --  v.x = v.x + world.width
-        --end
+        if v.x > world.width + 30 then
+          v.x = -20
+        elseif v.x < -30 then
+          v.x = world.width + 20
+        end
 
-        --if v.y > world.height then
-        --  v.y = v.y - world.height
-        --elseif v.y < 0 then
-        --  v.y = v.y + world.height
-        --end
+        if v.y > world.height + 30 then
+          v.y = -20
+        elseif v.y < -30 then
+          v.y = world.height + 20
+        end
 
         if circle_overlap(player.x, player.y, 16, v.x, v.y, v.radius) then
           initiateScreenshake()
@@ -129,7 +129,7 @@ function updatePlayState(dt)
         if circle_overlap(player.x, player.y, player.radius, l.x, l.y, l.radius) then
             initiateScreenshake()
             love.audio.play(player.damage_sound)
-            l.removal_flag = true
+            --l.removal_flag = true
             if onPlayerDamage(l.x, l.y) then
                 return
             end
@@ -139,6 +139,18 @@ function updatePlayState(dt)
             if circle_overlap(b.x, b.y, 4, l.x, l.y, l.radius) then
                 b.removal_flag = true
                 l.removal_flag = true
+                world.score = world.score + lancer.score
+
+                local p = {}
+                p.x = (l.x + b.x) / 2
+                p.y = (l.y + b.y) / 2
+                p.age = 0
+                p.lifespan = explosion_particle.lifespan
+                p.image = explosion_particle.image
+                table.insert(particles, p)
+
+                initiateScreenshake()
+                love.audio.play(enemy.damage_sound)
             end
         end
 
@@ -146,6 +158,18 @@ function updatePlayState(dt)
             if circle_overlap(s.x, s.y, 4, l.x, l.y, l.radius) then
                 s.removal_flag = true
                 l.removal_flag = true
+                world.score = world.score + lancer.score
+
+                local p = {}
+                p.x = (l.x + s.x) / 2
+                p.y = (l.y + s.y) / 2
+                p.age = 0
+                p.lifespan = explosion_particle.lifespan
+                p.image = explosion_particle.image
+                table.insert(particles, p)
+
+                initiateScreenshake()
+                love.audio.play(enemy.damage_sound)
             end
         end
     end
@@ -154,7 +178,7 @@ function updatePlayState(dt)
         if circle_overlap(player.x, player.y, player.radius, l.x, l.y, l.radius) then
             initiateScreenshake()
             love.audio.play(player.damage_sound)
-            l.removal_flag = true
+            --l.removal_flag = true
             if onPlayerDamage(l.x, l.y) then
                 return
             end
@@ -164,6 +188,18 @@ function updatePlayState(dt)
             if circle_overlap(b.x, b.y, 4, l.x, l.y, l.radius) then
                 b.removal_flag = true
                 l.removal_flag = true
+                world.score = world.score + salvo.score
+
+                local p = {}
+                p.x = (l.x + b.x) / 2
+                p.y = (l.y + b.y) / 2
+                p.age = 0
+                p.lifespan = explosion_particle.lifespan
+                p.image = explosion_particle.image
+                table.insert(particles, p)
+
+                initiateScreenshake()
+                love.audio.play(enemy.damage_sound)
             end
         end
 
@@ -171,6 +207,18 @@ function updatePlayState(dt)
             if circle_overlap(s.x, s.y, 4, l.x, l.y, l.radius) then
                 s.removal_flag = true
                 l.removal_flag = true
+                world.score = world.score + salvo.score
+
+                local p = {}
+                p.x = (l.x + s.x) / 2
+                p.y = (l.y + s.y) / 2
+                p.age = 0
+                p.lifespan = explosion_particle.lifespan
+                p.image = explosion_particle.image
+                table.insert(particles, p)
+
+                initiateScreenshake()
+                love.audio.play(enemy.damage_sound)
             end
         end
     end
@@ -184,6 +232,22 @@ function updatePlayState(dt)
               return
           end
         end
+
+        for i,b in ipairs(bullet_weapon.shots) do
+            if circle_overlap(b.x, b.y, 4, m.x, m.y, m.radius) then
+                b.removal_flag = true
+                m.removal_flag = true
+                world.score = world.score + m.score
+            end
+        end
+
+        for i,s in ipairs(shell_weapon.shots) do
+            if circle_overlap(s.x, s.y, 4, m.x, m.y, m.radius) then
+                s.removal_flag = true
+                m.removal_flag = true
+                world.score = world.score + m.score
+            end
+        end
     end
 
     for i,a in ipairs(asteroids) do
@@ -192,16 +256,16 @@ function updatePlayState(dt)
       a.spin = a.spin + dt * a.spin_speed
       a.spin = a.spin % (2 * math.pi)
 
-      if a.x > world.width then
-        a.x = a.x - world.width
-      elseif a.x < 0 then
-        a.x = a.x + world.width
+      if a.x > world.width + 40 then
+        a.x = -30
+      elseif a.x < -40 then
+        a.x = world.width + 30
       end
 
-      if a.y > world.height then
-        a.y = a.y - world.height
-      elseif a.y < 0 then
-        a.y = a.y + world.height
+      if a.y > world.height + 40 then
+        a.y = -30
+      elseif a.y < -40 then
+        a.y = world.height + 30
       end
 
       if not a.removal_flag then
@@ -366,10 +430,10 @@ function drawPlayState()
     end
 
     drawHUD()
-    love.graphics.setColor(255,255,255)
-    love.graphics.printf(world.game_timer, 10, world.height - 15, world.width)
-    love.graphics.printf(spawner.asteroid_count, 10, world.height - 35, world.width)
-    love.graphics.printf(spawner.enemy_total_count, 10, world.height - 55, world.width)
+    --love.graphics.setColor(255,255,255)
+    --love.graphics.printf(world.game_timer, 10, world.height - 15, world.width)
+    --love.graphics.printf(#lancers, 10, world.height - 35, world.width)
+    --love.graphics.printf(spawner.enemy_total_count, 10, world.height - 55, world.width)
     --love.graphics.printf("fps " .. love.timer.getFPS(), 20, world.height - 40, world.width)
 
     love.graphics.pop()

@@ -35,8 +35,8 @@ function fire_bullet_weapon()
             player.yvel = player.yvel - bullet_round.mass * math.sin(player.rotation)
 
             local shot1 = {}
-            shot1.x = player.x + 14 * math.cos(player.rotation - 90)
-            shot1.y = player.y + 14 * math.sin(player.rotation - 90)
+            shot1.x = player.x + 12 * math.cos(player.rotation - 90)
+            shot1.y = player.y + 12 * math.sin(player.rotation - 90)
             shot1.tvel = tv
             shot1.rotation = player.rotation
 
@@ -48,8 +48,8 @@ function fire_bullet_weapon()
             table.insert(bullet_weapon.shots, shot1)
 
             local shot2 = {}
-            shot2.x = player.x + 14 * math.cos(player.rotation + 90)
-            shot2.y = player.y + 14 * math.sin(player.rotation + 90)
+            shot2.x = player.x + 12 * math.cos(player.rotation + 90)
+            shot2.y = player.y + 12 * math.sin(player.rotation + 90)
             shot2.rotation = player.rotation
 
             local txv = bullet_round.velocity * math.cos(shot2.rotation) + math.abs(player.xvel) * math.cos(player.rotation)

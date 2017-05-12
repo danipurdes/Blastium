@@ -20,7 +20,7 @@ function drawSplashscreen()
     love.graphics.draw(splashscreen.keyboard_icon, 300,300, 0, 4, 4, splashscreen.keyboard_icon:getWidth()/2, splashscreen.keyboard_icon:getHeight()/2)
 
     love.graphics.setFont(fonts.font_text)
-    love.graphics.setColor(255,255,255,255)
+    love.graphics.setColor(255,255,255,splashscreen.reveal_alpha)
     love.graphics.printf("GAME REQUIRES KEYBOARD", 0, 300 + 20 + 2*splashscreen.keyboard_icon:getHeight(), world.width, "center")
 end
 

@@ -52,7 +52,7 @@ function drawMainMenu()
     love.graphics.draw(world.logo, 300, lerp(logo_anim.start_y, logo_anim.t, logo_anim.end_y, logo_anim.lifespan), 0, 4, 4, world.logo:getWidth()/2, world.logo:getHeight()/2)
     love.graphics.setFont(fonts.font_text)
 
-    love.graphics.setColor(255, 255, 255);
+    love.graphics.setColor(255, 255, 255)
     love.graphics.printf(main_menu.option_0, 0, world.height / 2, world.width, "center")
     love.graphics.printf(main_menu.option_1, 0, world.height / 2 + 20, world.width, "center")
     --love.graphics.printf(main_menu.option_2, 0, world.height / 2 + 40, world.width, "center")
@@ -62,6 +62,7 @@ function drawMainMenu()
     love.graphics.draw(main_menu.indicator_left, main_menu.ind_left_x, main_menu.ind_base_y + (main_menu.ind_scale_y * main_menu.index), 0)
     love.graphics.draw(main_menu.indicator_right, main_menu.ind_right_x, main_menu.ind_base_y + (main_menu.ind_scale_y * main_menu.index), 0)
 
+    love.graphics.printf("HIGHSCORE " .. highscore.score, 0, 20, world.width, "center")
     love.graphics.printf("USE ARROW KEYS AND SPACE TO NAVIGATE MENUS", 0, world.height - 30, world.width, "center")
     end
 

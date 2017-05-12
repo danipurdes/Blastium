@@ -59,6 +59,8 @@ function drawPauseMenu()
 
     love.graphics.setColor(0,0,0,255)
     love.graphics.rectangle("fill", 150, 150, 300, 300)
+    love.graphics.rectangle("line", 146, 146, 308, 308)
+    love.graphics.rectangle("line", 147, 147, 306, 306)
 
     love.graphics.setColor(255, 255, 255)
     love.graphics.setFont(fonts.font_title)

@@ -1,24 +1,32 @@
 spawner = {}
 
-spawner.asteroid_spawn_timer = 5
-spawner.asteroid_spawn_cooldown = 5
+spawner.asteroid_spawn_timer = 17
+spawner.asteroid_spawn_cooldown = 17
 spawner.asteroid_count = 0
 
-spawner.enemy_fleet_timer = 8
-spawner.enemy_fleet_cooldown = 8
+spawner.enemy_fleet_timer = 7
+spawner.enemy_fleet_cooldown = 7
 
 spawner.enemy_timer = .5
 spawner.enemy_cooldown = .5
 
 spawner.enemy_total_count = 0
-spawner.enemy_total_cap = 9
+spawner.enemy_total_cap = 12
 
-spawner.enemy_count = 3
+spawner.enemy_count = 0
 spawner.enemy_total = 3
 
-spawner.fleet_mag = 0
+spawner.fleet_mag = 300
 spawner.fleet_side = 0
 spawner.fleet_angle = 0
+
+spawner.lancer_spawn_timer = 19
+spawner.lancer_spawn_cooldown = 19
+spawner.lancer_cap = 2
+
+spawner.salvo_spawn_timer = 23
+spawner.salvo_spawn_cooldown = 23
+spawner.salvo_cap = 2
 
 function loadSpawner()
     spawner.asteroid_spawn_timer = 5
@@ -30,11 +38,8 @@ function loadSpawner()
 
     spawner.enemy_total_count = 0
 
-    spawnSalvo(100,200)
-    spawnSalvo(500,500)
-
-    spawnLancer(500,200)
-    spawnLancer(100,500)
+    spawner.lancer_spawn_timer = spawner.lancer_spawn_cooldown
+    spawner.salvo_spawn_timer = spawner.salvo_spawn_cooldown
 end
 
 function updateSpawner(dt)
@@ -68,18 +73,32 @@ function updateSpawner(dt)
             spawner.enemy_timer = spawner.enemy_cooldown
         end
     end
+
+    spawner.lancer_spawn_timer = spawner.lancer_spawn_timer - dt
+    if spawner.lancer_spawn_timer <= 0 then
+        if #lancers < spawner.lancer_cap then
+            local ang = math.pi * 2 * love.math.random()
+            spawnLancer(world.width/2 + 440 * math.cos(ang), world.height/2 + 440 * math.sin(ang))
+        end
+        spawner.lancer_spawn_timer = spawner.lancer_spawn_cooldown
+    end
+
+    spawner.salvo_spawn_timer = spawner.salvo_spawn_timer - dt
+    if spawner.salvo_spawn_timer <= 0 then
+        if #salvos < spawner.salvo_cap then
+            local ang = math.pi * 2 * love.math.random()
+            spawnSalvo(world.width/2 + 440 * math.cos(ang), world.height/2 + 440 * math.sin(ang))
+        end
+        spawner.salvo_spawn_timer = spawner.salvo_spawn_cooldown
+    end
 end
 
 function spawnEnemy(fMag, fSide, fAngle)
     local mag = fMag
     local side = fSide
-    local x = 0
-    local y = 0
     local ang = fAngle
 
     local e = {}
-    e.x = x
-    e.y = y
     e.speed = enemy.speed
     e.image = enemy.image
     e.radius = enemy.radius
@@ -105,12 +124,14 @@ function spawnEnemy(fMag, fSide, fAngle)
         ang = ang * math.pi / 2 + 7 * math.pi / 4
     end
 
+    e.x = x
+    e.y = y
     e.rotation = ang
     table.insert(enemies, e)
 end
 
 function spawnAsteroid32()
-    local side = 0 --love.math.random(0,3)
+    local side = love.math.random(0,3)
     local mag = love.math.random(50,550)
     local x = 0
     local y = 0
@@ -127,18 +148,18 @@ function spawnAsteroid32()
 
     if side == 0 then
         x = mag
-        y = -20
+        y = -40
         ang = ang * math.pi / 2 + math.pi / 4
     elseif side == 1 then
         x = mag
-        y = world.height + 20
+        y = world.height + 40
         ang = ang * math.pi / 2 + 5 * math.pi / 4
     elseif side == 2 then
-        x = -20
+        x = -40
         y = mag
         ang = ang * math.pi / 2 + 3 * math.pi / 4
     elseif side == 3 then
-        x = world.width + 20
+        x = world.width + 40
         y = mag
         ang = ang * math.pi / 2 + 7 * math.pi / 4
     end
