@@ -141,6 +141,7 @@ function love.load()
 
     --success = love.filesystem.write("data.txt","4000 PABLO")
     --contents = love.filesystem.read("data.txt")
+    --love.filesystem.remove("data.txt")
 
     loadHighscores()
 

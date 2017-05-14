@@ -6,6 +6,9 @@ highscore.name = "PABLO"
 highscore.save_contents = ""
 
 function loadHighscores()
+    if not love.filesystem.exists("data.txt") then
+        love.filesystem.write("data.txt","10000 PABLO")
+    end
     highscore.save_contents = love.filesystem.read("data.txt")
     local pair = str_explode(highscore.save_contents, " ")
     highscore.score = tonumber(pair[1])
