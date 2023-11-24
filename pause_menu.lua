@@ -48,34 +48,34 @@ function keypressedPauseMenu(key)
     end
 end
 
-function drawPauseMenu()
-    drawStarfield()
-    drawShots()
-    drawPlayer()
-    drawHUD()
+function drawPauseMenu(origin_x, origin_y)
+    drawStarfield(origin_x, origin_y)
+    drawShots(origin_x, origin_y)
+    drawPlayer(origin_x, origin_y)
+    drawHUD(origin_x, origin_y)
 
     love.graphics.setColor(100,100,100,100)
-    love.graphics.rectangle("fill", 0, 0, world.width, world.height)
+    love.graphics.rectangle("fill", origin_x, origin_y, world.width, world.height)
 
     love.graphics.setColor(0,0,0,255)
-    love.graphics.rectangle("fill", 150, 150, 300, 300)
-    love.graphics.rectangle("line", 146, 146, 308, 308)
-    love.graphics.rectangle("line", 147, 147, 306, 306)
+    love.graphics.rectangle("fill", origin_x + 150, origin_y + 150, 300, 300)
+    love.graphics.rectangle("line", origin_x + 146, origin_y + 146, 308, 308)
+    love.graphics.rectangle("line", origin_x + 147, origin_y + 147, 306, 306)
 
     love.graphics.setColor(255, 255, 255)
     love.graphics.setFont(fonts.font_title)
     local pause_text = "- PAUSED -"
-    love.graphics.printf(pause_text, 0, world.height / 2 - 40, world.width, "center")
+    love.graphics.printf(pause_text, origin_x, origin_y + world.height / 2 - 40, world.width, "center")
     love.graphics.setFont(fonts.font_text)
-    love.graphics.printf(pause_menu.option_0, 0, world.height / 2, world.width, "center")
-    love.graphics.printf(pause_menu.option_1, 0, world.height / 2 + 20, world.width, "center")
+    love.graphics.printf(pause_menu.option_0, origin_x, origin_y + world.height / 2, world.width, "center")
+    love.graphics.printf(pause_menu.option_1, origin_x, origin_y + world.height / 2 + 20, world.width, "center")
     --love.graphics.printf(pause_menu.option_2, 0, world.height / 2 + 40, world.width, "center")
-    love.graphics.printf(pause_menu.option_3, 0, world.height / 2 + 40, world.width, "center")
+    love.graphics.printf(pause_menu.option_3, origin_x, origin_y + world.height / 2 + 40, world.width, "center")
 
-    love.graphics.draw(pause_menu.indicator_left, pause_menu.ind_left_x, pause_menu.ind_base_y + (pause_menu.ind_scale_y * pause_menu.index), 0)
-    love.graphics.draw(pause_menu.indicator_right, pause_menu.ind_right_x, pause_menu.ind_base_y + (pause_menu.ind_scale_y * pause_menu.index), 0)
+    love.graphics.draw(pause_menu.indicator_left, origin_x + pause_menu.ind_left_x, origin_y + pause_menu.ind_base_y + (pause_menu.ind_scale_y * pause_menu.index), 0)
+    love.graphics.draw(pause_menu.indicator_right, origin_x + pause_menu.ind_right_x, origin_y + pause_menu.ind_base_y + (pause_menu.ind_scale_y * pause_menu.index), 0)
 
-    love.graphics.printf("USE ARROW KEYS AND SPACE TO NAVIGATE MENUS", 0, world.height - 30, world.width, "center")
+    love.graphics.printf("USE ARROW KEYS AND SPACE TO NAVIGATE MENUS", origin_x, origin_y + world.height - 30, world.width, "center")
 end
 
 return pause_menu

@@ -27,11 +27,11 @@ function resetStar(star, x, y)
     return star
 end
 
-function drawStarfield()
+function drawStarfield(origin_x, origin_y)
     for i=1,#starfield.stars,1 do
         local v = starfield.stars[i]
         love.graphics.setColor(v.color_r, v.color_g, v.color_b);
-        love.graphics.circle("fill",v.x,v.y,v.radius,6)
+        love.graphics.circle("fill",origin_x + v.x,origin_y + v.y,v.radius,6)
     end
 end
 

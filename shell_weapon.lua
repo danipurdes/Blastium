@@ -60,9 +60,9 @@ function fire_shell_weapon()
     end
 end
 
-function drawShellRounds()
+function drawShellRounds(origin_x, origin_y)
     for i,v in ipairs(shell_weapon.shots) do
-      love.graphics.draw(shell_round.image, v.x, v.y, v.rotation, 1, 1, shell_round.image:getWidth()/2, shell_round.image:getHeight()/2)
+      love.graphics.draw(shell_round.image, origin_x + v.x, origin_y + v.y, v.rotation, 1, 1, shell_round.image:getWidth()/2, shell_round.image:getHeight()/2)
     end
 end
 

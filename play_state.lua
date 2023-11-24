@@ -388,48 +388,48 @@ function keypressedPlayState(key)
     end
 end
 
-function drawPlayState()
+function drawPlayState(origin_x, origin_y)
     love.graphics.push()
     love.graphics.translate(screenshake.current_magnitude, 0)
-    drawStarfield()
+    drawStarfield(origin_x, origin_y)
 
     love.graphics.setColor(255,255,255)
 
     for i=1,#enemies,1 do
       local v = enemies[i]
-      love.graphics.draw(v.image, v.x, v.y, v.rotation, 2, 2, v.image:getWidth()/2, v.image:getHeight()/2)
+      love.graphics.draw(v.image, origin_x + v.x, origin_y + v.y, v.rotation, 2, 2, v.image:getWidth()/2, v.image:getHeight()/2)
     end
 
     for i,l in ipairs(lancers) do
-        love.graphics.draw(l.draw_image, l.x, l.y, l.rotation, 2, 2, l.draw_image:getWidth()/2, l.draw_image:getWidth()/2)
+        love.graphics.draw(l.draw_image, origin_x + l.x, origin_y + l.y, l.rotation, 2, 2, l.draw_image:getWidth()/2, l.draw_image:getWidth()/2)
     end
 
     for i,s in ipairs(salvos) do
-        love.graphics.draw(s.draw_image, s.x, s.y, s.rotation, 2, 2, s.draw_image:getWidth()/2, s.draw_image:getWidth()/2)
+        love.graphics.draw(s.draw_image, origin_x + s.x, origin_y + s.y, s.rotation, 2, 2, s.draw_image:getWidth()/2, s.draw_image:getWidth()/2)
     end
 
     for i,m in ipairs(salvo.missiles) do
-        love.graphics.draw(salvo.missile_image, m.x, m.y, m.rotation, 1, 1, salvo.missile_image:getWidth()/2, salvo.missile_image:getHeight()/2)
+        love.graphics.draw(salvo.missile_image, origin_x + m.x, origin_y + m.y, m.rotation, 1, 1, salvo.missile_image:getWidth()/2, salvo.missile_image:getHeight()/2)
     end
 
     for i,a in ipairs(asteroids) do
-      love.graphics.draw(a.image, a.x, a.y, a.spin, 2, 2, a.image:getWidth()/2, a.image:getHeight()/2)
+      love.graphics.draw(a.image, origin_x + a.x, origin_y + a.y, a.spin, 2, 2, a.image:getWidth()/2, a.image:getHeight()/2)
     end
 
     for i,p in ipairs(particles) do
-        love.graphics.draw(p.image, p.x, p.y, 0, 2, 2, p.image:getWidth()/2, p.image:getHeight()/2)
+        love.graphics.draw(p.image, origin_x + p.x, origin_y + p.y, 0, 2, 2, p.image:getWidth()/2, p.image:getHeight()/2)
     end
 
     love.graphics.setColor(255,255,255)
-    drawShots()
-    drawPlayer()
+    drawShots(origin_x, origin_y)
+    drawPlayer(origin_x, origin_y)
 
     if player.state == "dead" then
         love.graphics.setColor(100,100,100,100)
-        love.graphics.rectangle("fill", 0, 0, world.width, world.height)
+        love.graphics.rectangle("fill", origin_x, origin_y, world.width, world.height)
     end
 
-    drawHUD()
+    drawHUD(origin_x, origin_y)
     --love.graphics.setColor(255,255,255)
     --love.graphics.printf(world.game_timer, 10, world.height - 15, world.width)
     --love.graphics.printf(#lancers, 10, world.height - 35, world.width)

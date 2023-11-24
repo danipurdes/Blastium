@@ -41,7 +41,7 @@ function updateAudioIcon(dt)
     end
 end
 
-function drawAudioIcon()
+function drawAudioIcon(origin_x, origin_y)
     local sound_icon
     if audio.mute then
         sound_icon = audio.icon_nosound
@@ -58,7 +58,7 @@ function drawAudioIcon()
         love.graphics.setColor(255,255,255,math.floor(255*(audio.icon_alpha_timer/audio.icon_alpha_cooldown)))
     end
 
-    love.graphics.draw(sound_icon, ix, iy)
+    love.graphics.draw(sound_icon, origin_x + ix, origin_y + iy)
 end
 
 return audio
