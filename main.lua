@@ -139,9 +139,9 @@ function love.load()
     love.graphics.setDefaultFilter("nearest", "nearest")
     --love.window.setIcon(window_icon)
     audio.music:setLooping(true)
-    audio.music:setVolume(.1)
-    love.audio.setVolume(audio.volume_max)
-    audio.volume_current = audio.volume_max
+    audio.music:setVolume(.02)
+    --love.audio.setVolume(audio.volume_max)
+    --audio.volume_current = audio.volume_max
     audio.music:play()
 
     --success = love.filesystem.write("data.txt","4000 PABLO")

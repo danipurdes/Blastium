@@ -51,10 +51,10 @@ end
 function playerMovement(dt)
     vel_total = math.sqrt(math.pow(player.xvel,2) + math.pow(player.yvel,2))
 
-    if love.keyboard.isDown("d") then
+    if love.keyboard.isDown("right") then
         --player.ANGACCEL = ANGACCEL * dt / vel_total
         player.rotation = player.rotation + (vel_total/player.max_speed + 1) * (player.rotation_speed * math.pi / 180) * dt;
-    elseif love.keyboard.isDown("a") then
+    elseif love.keyboard.isDown("left") then
         --player.ANGACCEL = -ANGACCEL * dt / vel_total
         player.rotation = player.rotation - (vel_total/player.max_speed + 1) * (player.rotation_speed * math.pi / 180) * dt;
     end
@@ -63,13 +63,13 @@ function playerMovement(dt)
     --player.rotation = player.rotation + player.ROTATION_S * dt
 
         -- forward backward
-        if love.keyboard.isDown("s") then
+        if love.keyboard.isDown("down") then
             -- decelerate / accelerate backwards
             player.xvel = player.xvel * .9
             player.yvel = player.yvel * .9
         end
 
-        if love.keyboard.isDown("w") then
+        if love.keyboard.isDown("up") then
             -- accelerate
             player.xvel = player.xvel + player.acceleration * dt * math.cos(player.rotation)
             player.yvel = player.yvel + player.acceleration * dt * math.sin(player.rotation)
@@ -105,7 +105,7 @@ function playerMovement(dt)
     bullet_weapon.firing_rate_current = math.max(0, bullet_weapon.firing_rate_current - dt)
     shell_weapon.firing_rate_current = math.max(0, shell_weapon.firing_rate_current - dt)
 
-    if love.keyboard.isDown("up") then
+    if love.keyboard.isDown("z") then
         fire_bullet_weapon()
     end
 
