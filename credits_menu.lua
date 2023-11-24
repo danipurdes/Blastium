@@ -29,7 +29,7 @@ function drawCreditsMenu()
     love.graphics.setFont(fonts.font_text)
 
     love.graphics.printf("- DEVELOPER -", 0, 190, world.width, "center")
-    love.graphics.printf("DANNY PURDES", 0, 210, world.width, "center")
+    love.graphics.printf("DANIELLE PURDES", 0, 210, world.width, "center")
 
     love.graphics.printf("- TECHNICAL CONSULTANT -", 0, 250, world.width, "center")
     love.graphics.printf("SCOTT MUNRO", 0, 270, world.width, "center")

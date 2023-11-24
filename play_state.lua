@@ -374,7 +374,7 @@ function updatePlayState(dt)
 end
 
 function keypressedPlayState(key)
-    if key == "left" then
+    if key == "x" then
       fire_shell_weapon()
     end
 
