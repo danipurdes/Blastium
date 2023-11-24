@@ -14,14 +14,14 @@ function updateSplashscreen(dt)
     end
 end
 
-function drawSplashscreen()
-    drawStarfield()
+function drawSplashscreen(origin_x, origin_y)
+    drawStarfield(origin_x, origin_y)
     love.graphics.setColor(255,255,255,splashscreen.reveal_alpha)
-    love.graphics.draw(splashscreen.keyboard_icon, 300,300, 0, 4, 4, splashscreen.keyboard_icon:getWidth()/2, splashscreen.keyboard_icon:getHeight()/2)
+    love.graphics.draw(splashscreen.keyboard_icon, origin_x + 300, origin_y + 300, 0, 4, 4, splashscreen.keyboard_icon:getWidth()/2, splashscreen.keyboard_icon:getHeight()/2)
 
     love.graphics.setFont(fonts.font_text)
     love.graphics.setColor(255,255,255,splashscreen.reveal_alpha)
-    love.graphics.printf("GAME REQUIRES KEYBOARD", 0, 300 + 20 + 2*splashscreen.keyboard_icon:getHeight(), world.width, "center")
+    love.graphics.printf("GAME REQUIRES KEYBOARD", origin_x, origin_y + 300 + 20 + 2*splashscreen.keyboard_icon:getHeight(), world.width, "center")
 end
 
 return splashscreen

@@ -130,6 +130,11 @@ function toPauseMenu()
     pause_menu.index = 0
 end
 
+game_window_offset_x = 0
+game_window_offset_y = 0
+game_window_origin_x = 0
+game_window_origin_y = 0
+
 function love.load()
     love.graphics.setDefaultFilter("nearest", "nearest")
     --love.window.setIcon(window_icon)
@@ -254,49 +259,43 @@ function love.draw()
   love.graphics.clear(20,20,20)
   love.graphics.setColor(255, 255, 255)
 
-  --love.graphics.setFont(fonts.font_text)
-  --love.graphics.printf(highscore.save_contents, 0, 200, world.width, "center")
-  --love.graphics.printf(highscore.score, 0, 220, world.width, "center")
-  --love.graphics.printf(highscore.name, 0, 240, world.width, "center")
-  love.graphics.setColor(255,255,255)
-
   if world.state == "splashscreen" then
-    drawSplashscreen()
+    drawSplashscreen(game_window_origin_x, game_window_origin_y)
 
   elseif world.state == "start/open" then
-      drawStarfield()
+      drawStarfield(game_window_origin_x, game_window_origin_y)
 
       love.graphics.setColor(255, 255, 255)
-      love.graphics.draw(world.logo, 300, lerp(logo_anim.start_y, logo_anim.t, logo_anim.end_y, logo_anim.lifespan), 0, 4, 4, world.logo:getWidth()/2, world.logo:getHeight()/2)
+      love.graphics.draw(world.logo, game_window_origin_x + 300, game_window_origin_y + lerp(logo_anim.start_y, logo_anim.t, logo_anim.end_y, logo_anim.lifespan), 0, 4, 4, world.logo:getWidth()/2, world.logo:getHeight()/2)
       love.graphics.setFont(fonts.font_text)
 
       if logo_anim.done then
           local start_text = "- PRESS SPACE TO PLAY -"
           local text_color = lerp(title_anim.state0_color, title_anim.t, title_anim.state1_color, title_anim.lifespan)
           love.graphics.setColor(text_color, text_color, text_color)
-          love.graphics.printf(start_text, 0, main_menu.ind_base_y, world.width, "center")
+          love.graphics.printf(start_text, game_window_origin_x, game_window_origin_y + main_menu.ind_base_y, world.width, "center")
       end
 
   elseif world.state == "start/main" then
-      drawMainMenu()
+      drawMainMenu(game_window_origin_x, game_window_origin_y)
 
   elseif world.state == "play" then
-      drawPlayState()
+      drawPlayState(game_window_origin_x, game_window_origin_y)
 
   elseif world.state == "pause" then
-      drawPauseMenu()
+      drawPauseMenu(game_window_origin_x, game_window_origin_y)
 
   elseif world.state == "controls" then
-      drawControlsMenu()
+      drawControlsMenu(game_window_origin_x, game_window_origin_y)
 
   elseif world.state == "options" then
-      drawOptionsMenu()
+      drawOptionsMenu(game_window_origin_x, game_window_origin_y)
 
   elseif world.state == "credits" then
-      drawCreditsMenu()
+      drawCreditsMenu(game_window_origin_x, game_window_origin_y)
 
   elseif world.state == "end" then
-      drawStarfield()
+      drawStarfield(game_window_origin_x, game_window_origin_y)
 
       love.graphics.setColor(255,255,255)
 
@@ -307,20 +306,38 @@ function love.draw()
       love.graphics.setFont(fonts.font_text)
       if world.high_score_flag then
         end_text = "- NEW HIGH SCORE -"
-        love.graphics.printf(end_text, 0, world.height / 2 - 20, world.width, "center")
-        love.graphics.printf(score_text, 0, world.height / 2 , world.width, "center")
+        love.graphics.printf(end_text, game_window_origin_x, game_window_origin_y + world.height / 2 - 20, world.width, "center")
+        love.graphics.printf(score_text, game_window_origin_x, game_window_origin_y + world.height / 2 , world.width, "center")
       else
         end_text = "- GAME OVER -"
-        love.graphics.printf(end_text, 0, world.height / 2 - 20, world.width, "center")
-        love.graphics.printf(score_text, 0, world.height / 2 , world.width, "center")
-        love.graphics.printf(high_score_text, 0, world.height / 2 + 20, world.width, "center")
+        love.graphics.printf(end_text, game_window_origin_x, game_window_origin_y + world.height / 2 - 20, world.width, "center")
+        love.graphics.printf(score_text, game_window_origin_x, game_window_origin_y + world.height / 2 , world.width, "center")
+        love.graphics.printf(high_score_text, game_window_origin_x, game_window_origin_y + world.height / 2 + 20, world.width, "center")
       end
   end
 
-  drawAudioIcon()
+  drawAudioIcon(game_window_origin_x, game_window_origin_y)
+
+  love.graphics.setColor(0,0,0)
+  -- left black bar
+  love.graphics.rectangle("fill", 0, 0, game_window_offset_x, love.graphics.getHeight())
+  -- right black bar
+  love.graphics.rectangle("fill", game_window_offset_x + 600, 0, game_window_offset_x, love.graphics.getHeight())
+  -- top black bar
+  love.graphics.rectangle("fill", game_window_offset_x, 0, 600, game_window_offset_y)
+  -- bottom black bar
+  love.graphics.rectangle("fill", game_window_offset_x, game_window_offset_y + 600, 600, game_window_offset_y)
 end
 
-function drawShots()
-    drawBulletRounds()
-    drawShellRounds()
+function love.resize(w, h)
+    print(("Window resized to width: %d and height: %d."):format(w, h))
+    game_window_offset_x = (w - 600) / 2
+    game_window_offset_y = (h - 600) / 2
+    game_window_origin_x = game_window_offset_x
+    game_window_origin_y = game_window_offset_y
+end
+
+function drawShots(origin_x, origin_y)
+    drawBulletRounds(origin_x, origin_y)
+    drawShellRounds(origin_x, origin_y)
 end

@@ -69,9 +69,9 @@ function fire_bullet_weapon()
     end
 end
 
-function drawBulletRounds()
+function drawBulletRounds(origin_x, origin_y)
     for i,v in ipairs(bullet_weapon.shots) do
-      love.graphics.draw(bullet_round.image, v.x, v.y, v.rotation, 1, 1, bullet_round.image:getWidth()/2, bullet_round.image:getHeight()/2)
+      love.graphics.draw(bullet_round.image, origin_x + v.x, origin_y + v.y, v.rotation, 1, 1, bullet_round.image:getWidth()/2, bullet_round.image:getHeight()/2)
     end
 end
 

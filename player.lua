@@ -119,7 +119,7 @@ function playerMovement(dt)
     end
 end
 
-function drawPlayer()
+function drawPlayer(origin_x, origin_y)
     if player.active then
         if not player.hurt then
             love.graphics.setColor(255,255,255)
@@ -127,22 +127,22 @@ function drawPlayer()
             love.graphics.setColor(200 + 55 * (1 - player.hurtTimer), 50 + 100 * (1 - player.hurtTimer), 50 + 100 * (1 - player.hurtTimer))
         end
 
-        love.graphics.draw(player.image, player.x, player.y, player.rotation, 1, 1, player.image:getWidth()/2, player.image:getHeight()/2)
+        love.graphics.draw(player.image, origin_x + player.x, origin_y + player.y, player.rotation, 1, 1, player.image:getWidth()/2, player.image:getHeight()/2)
         local px = player.x
         local py = player.y
         local hx = world.width/2
         local hy = world.height/2
         if ((hx-px)^2+(hy-py)^2)^0.5 > 250 then
-            love.graphics.draw(player.image, player.x - world.width, player.y - world.height, player.rotation, 1, 1, 16, 16)
-            love.graphics.draw(player.image, player.x - world.width, player.y, player.rotation, 1, 1, 16, 16)
-            love.graphics.draw(player.image, player.x - world.width, player.y + world.height, player.rotation, 1, 1, 16, 16)
+            love.graphics.draw(player.image, origin_x + player.x - world.width, origin_y + player.y - world.height, player.rotation, 1, 1, 16, 16)
+            love.graphics.draw(player.image, origin_x + player.x - world.width, origin_y + player.y, player.rotation, 1, 1, 16, 16)
+            love.graphics.draw(player.image, origin_x + player.x - world.width, origin_y + player.y + world.height, player.rotation, 1, 1, 16, 16)
 
-            love.graphics.draw(player.image, player.x, player.y - world.height, player.rotation, 1, 1, 16, 16)
-            love.graphics.draw(player.image, player.x, player.y + world.height, player.rotation, 1, 1, 16, 16)
+            love.graphics.draw(player.image, origin_x + player.x, origin_y + player.y - world.height, player.rotation, 1, 1, 16, 16)
+            love.graphics.draw(player.image, origin_x + player.x, origin_y + player.y + world.height, player.rotation, 1, 1, 16, 16)
 
-            love.graphics.draw(player.image, player.x + world.width, player.y - world.height, player.rotation, 1, 1, 16, 16)
-            love.graphics.draw(player.image, player.x + world.width, player.y, player.rotation, 1, 1, 16, 16)
-            love.graphics.draw(player.image, player.x + world.width, player.y + world.height, player.rotation, 1, 1, 16, 16)
+            love.graphics.draw(player.image, origin_x + player.x + world.width, origin_y + player.y - world.height, player.rotation, 1, 1, 16, 16)
+            love.graphics.draw(player.image, origin_x + player.x + world.width, origin_y + player.y, player.rotation, 1, 1, 16, 16)
+            love.graphics.draw(player.image, origin_x + player.x + world.width, origin_y + player.y + world.height, player.rotation, 1, 1, 16, 16)
         end
 
         --love.graphics.points(player.x + 60 * math.cos(player.rotation), player.y + 60 * math.sin(player.rotation))

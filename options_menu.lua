@@ -49,15 +49,15 @@ function keypressedOptionsMenu(key)
     end
 end
 
-function drawOptionsMenu()
+function drawOptionsMenu(origin_x, origin_y)
     love.graphics.setFont(fonts.text_font)
     love.graphics.setColor(255,255,255)
-    love.graphics.printf(options_menu.option_1_title, 40, world.height / 2 - 50, world.width - 40, "left")
-    love.graphics.rectangle("fill", 40, world.height / 2 - 20, 104, 4)
-    love.graphics.rectangle("fill", 40 + options_menu.option_1_value * 100, world.height / 2 - 28, 4, 16)
-    love.graphics.printf(options_menu.option_2_title, 40, world.height / 2 + 10, world.width - 40, "left")
-    love.graphics.rectangle("fill", 40, world.height / 2 + 40, 104, 4)
-    love.graphics.rectangle("fill", 40 + options_menu.option_2_value * 100, world.height / 2 + 32, 4, 16)
+    love.graphics.printf(options_menu.option_1_title, origin_x + 40, origin_y + world.height / 2 - 50, world.width - 40, "left")
+    love.graphics.rectangle("fill", origin_x + 40, origin_y + world.height / 2 - 20, 104, 4)
+    love.graphics.rectangle("fill", origin_x + 40 + options_menu.option_1_value * 100, origin_y + world.height / 2 - 28, 4, 16)
+    love.graphics.printf(options_menu.option_2_title, origin_x + 40, origin_y + world.height / 2 + 10, world.width - 40, "left")
+    love.graphics.rectangle("fill", origin_x + 40, origin_y + world.height / 2 + 40, 104, 4)
+    love.graphics.rectangle("fill", origin_x + 40 + options_menu.option_2_value * 100, origin_y + world.height / 2 + 32, 4, 16)
 end
 
 return options_menu

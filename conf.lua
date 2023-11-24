@@ -8,7 +8,7 @@ function love.conf(t)
    t.window.minwidth = 600
    t.window.minheight = 600
    t.window.borderless = false
-   t.window.resizable = false
+   t.window.resizable = true
    t.window.vsync = false
    t.window.icon = "assets/images/blastium_icon.png"
 
