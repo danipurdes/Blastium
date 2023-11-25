@@ -7,12 +7,12 @@ Survive hostile space as long as you can in this 2d space shooter inspired by ar
 ## Controls:
 | Action | Key (en-US keyboard) |
 | --- | --- |
-| Accelerate | W |
-| Brake/Decelerate | S |
-| Rotate Counter-Clockwise | A |
-| Rotate Clockwise | D |
-| Fire Blaster | Up Arrow |
-| Fire Moonshot | Down Arrow |
+| Accelerate | Up Arrow |
+| Brake/Decelerate | Down Arrow |
+| Rotate Counter-Clockwise | Left Arrow |
+| Rotate Clockwise | Right Arrow |
+| Fire Blaster | Z |
+| Fire Moonshot | X |
 | Pause Game | P |
 | Mute Audio | M |
 
