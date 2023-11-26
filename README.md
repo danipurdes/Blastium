@@ -1,4 +1,4 @@
-# Blastium
+# Blastium v1.1
 [Play for free on Itch.io (Download required)](https://danipurdes.itch.io/blastium)
 
 ## Summary:
