@@ -54,7 +54,7 @@ function drawControlsMenu(origin_x, origin_y)
     love.graphics.printf("- PAUSE", origin_x + world.width / text_div + 20, origin_y + world.height / 2 + 120, world.width, "left")
     love.graphics.printf("- MUTE", origin_x + world.width / text_div + 20, origin_y + world.height / 2 + 140, world.width, "left")
 
-    love.graphics.printf("PRESS SPACE TO RETURN", origin_x, origin_y + world.height - 30, origin_y + world.width, "center")
+    love.graphics.printf("PRESS SPACE TO RETURN", origin_x, origin_y + world.height - 30, world.width, "center")
 end
 
 return controls_menu
