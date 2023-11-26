@@ -27,8 +27,8 @@ function drawCreditsMenu(origin_x, origin_y)
     love.graphics.draw(world.logo, origin_x + 300, origin_y + 124, 0, 4, 4, world.logo:getWidth()/2, world.logo:getHeight()/2)
 
     love.graphics.setFont(fonts.font_text)
-    love.graphics.printf("- DEVELOPER -", 0, 190, world.width, "center")
-    love.graphics.printf("DANIELLE PURDES", 0, 210, world.width, "center")
+    love.graphics.printf("- DEVELOPER -", origin_x, origin_y + 190, world.width, "center")
+    love.graphics.printf("DANIELLE PURDES", origin_x, origin_y + 210, world.width, "center")
 
     love.graphics.printf("- TECHNICAL CONSULTANT -", origin_x, origin_y + 250, world.width, "center")
     love.graphics.printf("SCOTT MUNRO", origin_x, origin_y + 270, world.width, "center")
